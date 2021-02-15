@@ -5,8 +5,16 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AVClient"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        Title="MainWindow" Height="200" Width="400">
     <Grid>
-        
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="95*"/>
+            <ColumnDefinition Width="101*"/>
+        </Grid.ColumnDefinitions>
+        <Label Content="Message:" Margin="0,0,68.322,120"/>
+        <TextBox x:Name="msg" Margin="10,30,200,100" Background="LightGray" Text="Hello pipe!" Grid.ColumnSpan="2" />
+        <Button Margin="9.678,10,10,80"  Name="snd" Content="Send to AVService" Click="snd_Click" Grid.Column="1"/>
+        <Label Content="Result:" Margin="0,70,0,60" Grid.ColumnSpan="2" />
+        <TextBox x:Name="res" Margin="10,100,10,10" IsEnabled="False" Grid.ColumnSpan="2" />
     </Grid>
 </Window>
