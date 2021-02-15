@@ -34,16 +34,19 @@ namespace AVClient
                 res[i] = (byte)str[i];
             }
 
-
+            return res;
+        }
+        private string byteToChar(byte[] buf)
+        {
+            var res = "";
+            for (int i = 0; i < buf.Length; i++)
+                res += (char)buf[i];
             return res;
         }
 
         private void snd_Click(object sender, RoutedEventArgs e)
         {
-            //System.Diagnostics.Process.Start("C:\\Users\\Maloslov\\source\\repos\\AntiV\\Debug\\AVService.exe");
-
             var message = charToByte(msg.Text);
-            //byte[] text = message;
             var pipe = 
                 new NamedPipeClientStream(".",
                 "avast",
@@ -51,8 +54,24 @@ namespace AVClient
                 PipeOptions.None,
                 System.Security.Principal.TokenImpersonationLevel.None);
             pipe.Connect();
-            //cannot write: ArgumentException
-            pipe.Write(message, message.Length-1, message.Length);
+            pipe.Write(message, 0, message.Length);
+            var buffer = new byte[128];
+            pipe.Read(buffer, 0, buffer.Length);
+            res.AppendText("Received message: " + byteToChar(buffer) + "\r\n");
+            pipe.Close();
+        }
+
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            var pipe =
+                new NamedPipeClientStream(".",
+                "avast",
+                PipeDirection.InOut,
+                PipeOptions.None,
+                System.Security.Principal.TokenImpersonationLevel.None);
+            pipe.Connect();
+            byte[] exit = charToByte("exit");
+            pipe.Write(exit, 0, exit.Length);
             pipe.Close();
         }
     }

@@ -1,6 +1,9 @@
 ﻿
 #include <iostream>
 #include "Windows.h"
+#include <string>
+
+#define BUFSIZE 128
 
 //on closing
 BOOL __stdcall HandlerRoutine(DWORD eventCode)
@@ -20,13 +23,11 @@ BOOL __stdcall HandlerRoutine(DWORD eventCode)
 
 
 
-
 int main()
 {
     setlocale(LC_ALL, "RU");
-    std::cout << "Server started. Creating named pipe...\n";
+    std::cout << "Server started. Creating named pipe..." << std::endl;
     SetConsoleCtrlHandler(HandlerRoutine, true);
-    
     
     HANDLE hNamedPipe = CreateNamedPipe(
         L"\\\\.\\pipe\\avast",
@@ -38,28 +39,47 @@ int main()
         0,
         NULL);
 
-    bool isCon = false;
-    std::cout << "Created. Waiting for connection...\n";
-    do {
-        isCon = ConnectNamedPipe(
+
+    while (true) {
+        bool isCon = false;
+        std::cout << "Waiting for connection..." << std::endl;
+        do {
+            isCon = ConnectNamedPipe(
+                hNamedPipe,
+                NULL);
+        } while (!isCon);
+
+        std::cout << "Connected. Reading message..." << std::endl;
+        byte buffer[BUFSIZE];
+        DWORD numBytesRead = 0;
+        ReadFile(
             hNamedPipe,
-            NULL);
-    } while (!isCon);
+            buffer, // the data from the pipe will be put here
+            BUFSIZE, //19 * sizeof(wchar_t), // number of bytes allocated
+            &numBytesRead, // this will store number of bytes actually read
+            NULL // not using overlapped IO
+        );
 
-    std::cout << "Connected. Reading message...\n";
-    wchar_t buf[128];
-    DWORD numBytesRead = 0;
-    ReadFile(
-        hNamedPipe,
-        buf, // the data from the pipe will be put here
-        127 * sizeof(wchar_t), // number of bytes allocated
-        &numBytesRead, // this will store number of bytes actually read
-        NULL // not using overlapped IO
-    );
-    int end = numBytesRead / sizeof(wchar_t);
-    buf[end] = '\0'; // null terminate the string
-    std::cout << "Message: " << buf << std::endl;
+        int end = numBytesRead;
+        buffer[end] = '\0'; // null terminate the string
 
+        std::cout << "Message: " << buffer << std::endl;
+        std::string code = "";
+        for (int i = 0; i < 5; i++)
+            code += buffer[i];
+        if (code._Equal("exit")) {
+            std::cout << "Session has ended." << std::endl;
+            break;
+        }
+        std::cout << "Writing message..." << std::endl;
+
+        WriteFile(
+            hNamedPipe,
+            buffer,
+            end,
+            0,
+            NULL
+        );
+    }
     CloseHandle(hNamedPipe);
-    getchar();
 }
