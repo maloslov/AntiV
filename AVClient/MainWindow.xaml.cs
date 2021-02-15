@@ -21,9 +21,17 @@ namespace AVClient
     /// </summary>
     public partial class MainWindow : Window
     {
+        private NamedPipeClientStream Pipe { get; }
+        private const int BUFSIZE = 128;
         public MainWindow()
         {
             InitializeComponent();
+            Pipe =
+                new NamedPipeClientStream(".",
+                "antiv",
+                PipeDirection.InOut,
+                PipeOptions.None,
+                System.Security.Principal.TokenImpersonationLevel.None);
         }
 
         private byte[] charToByte(String str)
@@ -46,33 +54,33 @@ namespace AVClient
 
         private void snd_Click(object sender, RoutedEventArgs e)
         {
+            if(!Pipe.IsConnected)
+                Pipe.Connect(10);
             var message = charToByte(msg.Text);
-            var pipe = 
-                new NamedPipeClientStream(".",
-                "avast",
-                PipeDirection.InOut,
-                PipeOptions.None,
-                System.Security.Principal.TokenImpersonationLevel.None);
-            pipe.Connect();
-            pipe.Write(message, 0, message.Length);
-            var buffer = new byte[128];
-            pipe.Read(buffer, 0, buffer.Length);
-            res.AppendText("Received message: " + byteToChar(buffer) + "\r\n");
-            pipe.Close();
+            var buffer = new byte[BUFSIZE];
+            try
+            {
+                Pipe.Write(message, 0, message.Length);
+                Pipe.Read(buffer, 0, buffer.Length);
+                res.AppendText("Received message: "
+                    + byteToChar(buffer) + "\r\n");
+            }
+            catch (System.IO.IOException)
+            {
+                MessageBox.Show("Pipe connection has broken", "Warning",
+                    MessageBoxButton.OK, MessageBoxImage.Warning);
+            }
         }
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            var pipe =
-                new NamedPipeClientStream(".",
-                "avast",
-                PipeDirection.InOut,
-                PipeOptions.None,
-                System.Security.Principal.TokenImpersonationLevel.None);
-            pipe.Connect();
+            if (!Pipe.IsConnected)
+            {
+                Pipe.Connect();
+            }
             byte[] exit = charToByte("exit");
-            pipe.Write(exit, 0, exit.Length);
-            pipe.Close();
+            Pipe.Write(exit, 0, exit.Length);
+            Pipe.Close();
         }
     }
 }

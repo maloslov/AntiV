@@ -29,18 +29,16 @@ int main()
     std::cout << "Server started. Creating named pipe..." << std::endl;
     SetConsoleCtrlHandler(HandlerRoutine, true);
     
-    HANDLE hNamedPipe = CreateNamedPipe(
-        L"\\\\.\\pipe\\avast",
+    HANDLE hNamedPipe = CreateNamedPipeW(
+        L"\\\\.\\pipe\\antiv",
         PIPE_ACCESS_DUPLEX,
         PIPE_TYPE_BYTE,
         3,
         0,
-        10000,
+        0,
         0,
         NULL);
 
-
-    while (true) {
         bool isCon = false;
         std::cout << "Waiting for connection..." << std::endl;
         do {
@@ -48,8 +46,10 @@ int main()
                 hNamedPipe,
                 NULL);
         } while (!isCon);
+        std::cout << "Connected. ";
 
-        std::cout << "Connected. Reading message..." << std::endl;
+    while (true) {
+        std::cout << "Reading message..." << std::endl;
         byte buffer[BUFSIZE];
         DWORD numBytesRead = 0;
         ReadFile(
@@ -65,8 +65,9 @@ int main()
 
         std::cout << "Message: " << buffer << std::endl;
         std::string code = "";
-        for (int i = 0; i < 5; i++)
+        for (int i = 0; i < 4; i++)
             code += buffer[i];
+        
         if (code._Equal("exit")) {
             std::cout << "Session has ended." << std::endl;
             break;
