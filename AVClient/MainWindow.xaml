@@ -15,6 +15,6 @@
         <TextBox x:Name="msg" Margin="10,30,200,100" Background="LightGray" Text="Hello pipe!" Grid.ColumnSpan="2" />
         <Button Margin="9.678,10,10,80"  Name="snd" Content="Send to AVService" Click="snd_Click" Grid.Column="1"/>
         <Label Content="Result:" Margin="0,70,0,60" Grid.ColumnSpan="2" />
-        <TextBox x:Name="res" Margin="10,100,10,10" IsEnabled="False" Grid.ColumnSpan="2" />
+        <TextBox x:Name="res" Margin="10,100,10,10" Grid.ColumnSpan="2" IsReadOnly="True" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" />
     </Grid>
 </Window>
