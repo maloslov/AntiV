@@ -3,7 +3,7 @@ My study project is making simple antivirus utility.
 
 Plan:
 
-1. :ballot_box_wich_check: Realize pipe IPC command
+1. :ballot_box_with_check: Realize pipe IPC command
 
 2. :black_square_button: Realize Bases, BasesLoader, BasesEditor
 
