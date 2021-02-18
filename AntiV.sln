@@ -12,6 +12,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AVBaseEditor", "AVBaseEditor\AVBaseEditor.csproj", "{96A42193-4851-4052-B9F0-E25C19B9CD75}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +46,18 @@ Global
 		{E020E4DB-9C16-43FD-AF7D-4FD1FE82301F}.Release|x64.Build.0 = Release|x64
 		{E020E4DB-9C16-43FD-AF7D-4FD1FE82301F}.Release|x86.ActiveCfg = Release|Win32
 		{E020E4DB-9C16-43FD-AF7D-4FD1FE82301F}.Release|x86.Build.0 = Release|Win32
+		{96A42193-4851-4052-B9F0-E25C19B9CD75}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96A42193-4851-4052-B9F0-E25C19B9CD75}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96A42193-4851-4052-B9F0-E25C19B9CD75}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{96A42193-4851-4052-B9F0-E25C19B9CD75}.Debug|x64.Build.0 = Debug|Any CPU
+		{96A42193-4851-4052-B9F0-E25C19B9CD75}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{96A42193-4851-4052-B9F0-E25C19B9CD75}.Debug|x86.Build.0 = Debug|Any CPU
+		{96A42193-4851-4052-B9F0-E25C19B9CD75}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96A42193-4851-4052-B9F0-E25C19B9CD75}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96A42193-4851-4052-B9F0-E25C19B9CD75}.Release|x64.ActiveCfg = Release|Any CPU
+		{96A42193-4851-4052-B9F0-E25C19B9CD75}.Release|x64.Build.0 = Release|Any CPU
+		{96A42193-4851-4052-B9F0-E25C19B9CD75}.Release|x86.ActiveCfg = Release|Any CPU
+		{96A42193-4851-4052-B9F0-E25C19B9CD75}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
