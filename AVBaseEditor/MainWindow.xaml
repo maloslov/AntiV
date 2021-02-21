@@ -36,7 +36,7 @@
                     <ComboBox Grid.Row="1" Grid.Column="2" IsEditable="True"></ComboBox>
                     <Label Content="Length:" Grid.Row="0" Grid.Column="3"/>
                     <ComboBox Grid.Row="1" Grid.Column="3" IsEditable="True"></ComboBox>
-                    <Label Content="SHA-256:" Grid.Row="0" Grid.Column="4"/>
+                    <Label Content="Hash:" Grid.Row="0" Grid.Column="4"/>
                     <ComboBox Grid.Row="1" Grid.Column="4" IsEditable="True"></ComboBox>
                     <Label Content="Offset start:" Grid.Row="0" Grid.Column="5"/>
                     <ComboBox Grid.Row="1" Grid.Column="5" IsEditable="True"></ComboBox>
@@ -63,18 +63,32 @@
                 <ColumnDefinition MinWidth="100"/>
                 <ColumnDefinition />
             </Grid.ColumnDefinitions>
-            <Button Content="Load base folder" Click="LoadBaseFromDirectory" Grid.Column="0" Margin="5,5,5,5"/>
-            <Button Content="Save base to folder" Click="SaveBaseToDirectory" Grid.Column="1" Margin="5,5,5,5"/>
-            <Button Content="Append record" Click="AppendBaseRecord" Grid.Column="2" Margin="5,5,5,5"/>
-            <Button Content="Delete records" Click="MenuItemDelete_Click" Grid.Column="3" Margin="5,5,5,5"/>
+            <Button Content="Choose base folder" Click="LoadBaseFromDirectory" Grid.Column="0" Margin="5,5,5,5"/>
+            <Button Content="Save base to file" Click="SaveBaseToDirectory" Grid.Column="1" Margin="5,5,5,5"/>
+            <Button Content="Append row to base" Click="AppendBaseRecord" Grid.Column="2" Margin="5,5,5,5"/>
+            <Button Content="Delete row(s)" Click="MenuItemDelete_Click" Grid.Column="3" Margin="5,5,5,5"/>
         </Grid>
         <Grid Grid.Row="2">
-            <DataGrid x:Name="dataGrid" AutoGenerateColumns="True" AlternatingRowBackground="LightGray">
+
+            <DataGrid x:Name="dataGrid" AutoGenerateColumns="False"  
+                      RowBackground="LightGray" AlternatingRowBackground="White">
                 <DataGrid.ContextMenu>
                     <ContextMenu >
-                        <MenuItem Header="Delete" Click="MenuItemDelete_Click"/>
+                        <MenuItem Header="Choose folder" Click="LoadBaseFromDirectory"/>
+                        <MenuItem Header="Save base" Click="SaveBaseToDirectory"/>
+                        <MenuItem Header="Append row" Click="AppendBaseRecord"/>
+                        <MenuItem Header="Delete row(s)" Click="MenuItemDelete_Click"/>
                     </ContextMenu>
                 </DataGrid.ContextMenu>
+                <DataGrid.Columns>
+                    <DataGridTextColumn Header="Virus name" Binding="{Binding VirusName}" MinWidth="90"/>
+                    <DataGridTextColumn Header="File type" Binding="{Binding FileType}" MinWidth="70"/>
+                    <DataGridTextColumn Header="Virus signature" Binding="{Binding Signature}" MinWidth="90"/>
+                    <DataGridTextColumn Header="All virus length" Binding="{Binding Length}" MinWidth="90"/>
+                    <DataGridTextColumn Header="All virus hash" Binding="{Binding Hash}" MinWidth="90"/>
+                    <DataGridTextColumn Header="Offset start" Binding="{Binding OffsetStart}" MinWidth="70"/>
+                    <DataGridTextColumn Header="Offset end" Binding="{Binding OffsetEnd}" MinWidth="70"/>
+                </DataGrid.Columns>
             </DataGrid>
         </Grid>
     </Grid>

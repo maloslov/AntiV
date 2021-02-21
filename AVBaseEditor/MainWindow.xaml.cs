@@ -22,12 +22,11 @@ namespace AVBaseEditor
     /// </summary>
     public partial class MainWindow : Window
     {
-        private List<BaseRecord> Base { get; set; }
+        public List<BaseRecord> Base { get; set; }
         private string BaseDirectory { get; set; }
         private const string Sign = "basov";
-        private const UInt32 recordCount = 512;
+        private const short recordCount = 512;
 
-        //public List<Phone> Phones { get; set; }
         public MainWindow()
         {
             InitializeComponent();
@@ -56,7 +55,7 @@ namespace AVBaseEditor
         {
             
             var openFileDialog = new OpenFileDialog();
-            openFileDialog.DefaultExt = "directory";
+            openFileDialog.DefaultExt = "Directory";
             openFileDialog.CheckFileExists = false;
             openFileDialog.Filter = "Directory|Directory";
             openFileDialog.FileName = "Directory";
@@ -69,7 +68,6 @@ namespace AVBaseEditor
         }
         private void SaveBaseToDirectory(object sender, RoutedEventArgs e)
         {
-            //throw new NotImplementedException();
             if (BaseDirectory == null)
                 LoadBaseFromDirectory(sender, e);
 
@@ -77,14 +75,14 @@ namespace AVBaseEditor
             //check file
             if (File.Exists(BaseDirectory + "base.avb"))
             {
-                //check sign
-                fs = new FileStream(BaseDirectory + "base.avb", 
+                //check file header
+                fs = new FileStream(BaseDirectory + "base.avb",
                     FileMode.Open);
-                byte[] buf = new byte[Sign.Length+1];
+                byte[] buf = new byte[Sign.Length];
                 fs.Read(buf, 0, buf.Length);
                 if (!Sign.Equals(btos(buf)))
                 {
-                    MessageBox.Show("Base file is broken!", "Warning", 
+                    MessageBox.Show("Base file is suspicious!", "Warning",
                         MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
@@ -92,28 +90,32 @@ namespace AVBaseEditor
             else
             {
                 //create & sign file
-                fs = new FileStream(BaseDirectory + "base.avb", 
+                fs = new FileStream(BaseDirectory + "base.avb",
                     FileMode.CreateNew);
                 fs.Write(stob(Sign), 0, Sign.Length);
-                var co = BitConverter.GetBytes(512);
-                //fs.Write(co, BaseDirectory.Length, co.Length);
+            }
+            byte[] buffer = BitConverter.GetBytes(recordCount).Concat(stob("\r\n")).ToArray();
+            fs.Write(buffer, 0, buffer.Length);
+            foreach(var r in Base)
+            {
+                byte[] record = r.ToBytes();
+                fs.Write(record, 0, record.Length);
             }
         }
-        private string btos(byte[] bytes)
+        public static string btos(byte[] bytes)
         {
             string res = "";
             foreach (char c in bytes)
                 res += c;
             return res;
         }
-        private byte[] stob(string str)
+        public static byte[] stob(string str)
         {
-            byte[] res = new byte[str.Length+1];
+            byte[] res = new byte[str.Length];
             for (int i = 0; i < str.Length; i++)
             {
                 res[i] = (byte)str[i];
             }
-            res[str.Length] = (byte)'\0';
             return res;
         }
         private void AppendBaseRecord(object sender, RoutedEventArgs e)
