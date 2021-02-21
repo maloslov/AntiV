@@ -53,23 +53,60 @@ namespace AVBaseEditor
 
         private void LoadBaseFromDirectory(object sender, RoutedEventArgs e)
         {
-            
             var openFileDialog = new OpenFileDialog();
-            openFileDialog.DefaultExt = "Directory";
+            openFileDialog.DefaultExt = "avb";
             openFileDialog.CheckFileExists = false;
-            openFileDialog.Filter = "Directory|Directory";
+            openFileDialog.Filter = "Directory|Directory|AntiV Base|*.avb";
             openFileDialog.FileName = "Directory";
             if (openFileDialog.ShowDialog() == true)
             {
                 BaseDirectory = openFileDialog.FileName.Substring(0, 
                     openFileDialog.FileName.LastIndexOf('\\')+1);
-                MessageBox.Show(BaseDirectory);
             }
+            FileStream fs = new FileStream(BaseDirectory + "base.avb", FileMode.Open);
+            byte[] buffer = new byte[Sign.Length];
+            fs.Read(buffer, 0, buffer.Length);
+            if(!Sign.Equals(btos(buffer)))
+            {
+                MessageBox.Show("Base file is suspicious!", "Warning",
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            Base.Clear();
+            int c = fs.ReadByte();
+            while(c != -1)
+            {
+                if(c==10 || c == 13) //CR or LF
+                {
+                    c = fs.ReadByte();
+                    if (buffer.Length > 7)
+                        Base.Add(new BaseRecord(buffer));
+                    buffer = new byte[0];
+                    continue;
+                }
+                buffer = buffer.Append((byte)c).ToArray();
+
+                c = fs.ReadByte();
+
+            }
+            dataGrid.Items.Refresh();
         }
         private void SaveBaseToDirectory(object sender, RoutedEventArgs e)
         {
             if (BaseDirectory == null)
-                LoadBaseFromDirectory(sender, e);
+            {
+                var saveFileDialog = new SaveFileDialog();
+                saveFileDialog.DefaultExt = "avb";
+                saveFileDialog.CheckFileExists = false;
+                saveFileDialog.Filter = "Directory|Directory|AntiV Base|*.avb";
+                saveFileDialog.FileName = "base";
+                if (saveFileDialog.ShowDialog() == true)
+                {
+                    BaseDirectory = saveFileDialog.FileName.Substring(0,
+                        saveFileDialog.FileName.LastIndexOf('\\') + 1);
+                }
+            }
 
             FileStream fs;
             //check file
@@ -100,6 +137,7 @@ namespace AVBaseEditor
             {
                 byte[] record = r.ToBytes();
                 fs.Write(record, 0, record.Length);
+                fs.Write(stob("\r\n"), 0, 2);
             }
         }
         public static string btos(byte[] bytes)

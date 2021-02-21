@@ -38,17 +38,60 @@ namespace AVBaseEditor
             this.OffsetEnd = OffsetEnd;
         }
 
+        public BaseRecord(byte[] record)
+        {
+            byte state = 0;
+            var val = new byte[0];
+            foreach (byte b in record)
+            {
+                if (b != 9) //tab
+                {
+                    val = val.Append(b).ToArray();
+                    continue;
+                }
+                state++;
+
+                if (val.Length > 0)
+                    switch (state)
+                    {
+                        case 1:
+                            VirusName = MainWindow.btos(val);
+                            break;
+                        case 2:
+                            FileType = MainWindow.btos(val);
+                            break;
+                        case 3:
+                            Signature = val[0];
+                            break;
+                        case 4:
+                            Length = BitConverter.ToUInt32(val, 0);
+                            break;
+                        case 5:
+                            Hash = BitConverter.ToUInt32(val, 0);
+                            break;
+                        case 6:
+                            OffsetStart = BitConverter.ToUInt32(val, 0);
+                            break;
+                        case 7:
+                            OffsetEnd = BitConverter.ToUInt32(val, 0);
+                            break;
+                    }
+                val = new byte[0];
+            }
+        }
+
         public byte[] ToBytes()
         {
-            byte[] lenbytes = BitConverter.GetBytes(Length).Append((byte)'\t').ToArray(),
-                hashbytes = BitConverter.GetBytes(Hash).Append((byte)'\t').ToArray(),
-                startbytes = BitConverter.GetBytes(OffsetStart).Append((byte)'\t').ToArray(),
-                endbytes = BitConverter.GetBytes(OffsetEnd).Concat(MainWindow.stob("\r\n")).ToArray();
+            byte[] lenbytes = BitConverter.GetBytes(Length).ToArray(),
+                hashbytes = BitConverter.GetBytes(Hash).ToArray(),
+                startbytes = BitConverter.GetBytes(OffsetStart).ToArray(),
+                endbytes = BitConverter.GetBytes(OffsetEnd).ToArray();
 
             byte[] res = MainWindow.stob(VirusName+'\t').Concat(
-                MainWindow.stob(FileType+'\t')).Concat(
-                lenbytes).Concat(hashbytes).Concat(
-                startbytes).Concat(endbytes).ToArray();
+                MainWindow.stob(FileType+'\t')).Append(Signature).Append(
+                (byte)9).Concat(lenbytes).Append((byte)9).Concat(hashbytes).Append(
+                (byte)9).Concat(startbytes).Append((byte)9).Concat(endbytes).Append(
+                (byte)9).ToArray();
             return res;
         }
     }
