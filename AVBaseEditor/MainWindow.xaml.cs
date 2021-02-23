@@ -33,12 +33,15 @@ namespace AVBaseEditor
             Base = new List<BaseRecord>();
             dataGrid.ItemsSource = Base;
             //Test Example
-            Base.Add(new BaseRecord("Petya", "exe", 0b_1010_1010, 25, 5465656, 1, 56));
-            Base.Add(new BaseRecord("Vanya", "txt", 0b_1110_1010, 25, 5465321, 2, 16));
-            Base.Add(new BaseRecord("Sasha", "png", 0b_0110_1011, 27, 5466235, 21, 26));
-            Base.Add(new BaseRecord("Misha", "mp3", 0b_1011_1011, 27, 5456173, 11, 26));
-            Base.Add(new BaseRecord("Pasha", "mp4", 0b_1011_1111, 29, 5656213, 12, 15));
-            Base.Add(new BaseRecord("Maxim", "pdf", 0b_1011_0110, 28, 4656978, 14, 51));
+            for (int i = 0; i < 5; i++)
+            {
+                Base.Add(new BaseRecord("Petya", "exe", 0b_1010_1010, 25, 5465656, 1, 56));
+                Base.Add(new BaseRecord("Vanya", "txt", 0b_1110_1010, 25, 5465321, 2, 16));
+                Base.Add(new BaseRecord("Sasha", "png", 0b_0110_1011, 27, 5466235, 21, 26));
+                Base.Add(new BaseRecord("Misha", "mp3", 0b_1011_1011, 27, 5456173, 11, 26));
+                Base.Add(new BaseRecord("Pasha", "mp4", 0b_1011_1111, 29, 5656213, 12, 15));
+                Base.Add(new BaseRecord("Maxim", "pdf", 0b_1011_0110, 28, 4656978, 14, 51));
+            }
         }
 
         private void MenuItemDelete_Click(object sender, RoutedEventArgs e)
@@ -158,11 +161,33 @@ namespace AVBaseEditor
         }
         private void AppendBaseRecord(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
+            if(boxName.Text.Length > 0 && boxType.Text.Length > 0
+                && boxSign.Text.Length > 0 && boxLen.Text.Length > 0
+                && boxHash.Text.Length  > 0 && boxStart.Text.Length > 0
+                && boxEnd.Text.Length > 0)
+            {
+                var record = new BaseRecord(boxName.Text, boxType.Text,
+                    Convert.ToByte(boxSign.Text),
+                    Convert.ToUInt32(boxLen.Text),
+                    Convert.ToUInt32(boxHash.Text),
+                    Convert.ToUInt32(boxStart.Text),
+                    Convert.ToUInt32(boxEnd.Text));
+
+                if (Base.Exists(x => x.Signature == record.Signature
+                    && x.Length == record.Length
+                    && x.Hash == record.Hash))
+                {
+                    return;
+                }
+
+                Base.Add(record);
+                dataGrid.Items.Refresh();
+            }
         }
-        private void CalculateMalwareData(object sender, RoutedEventArgs e)
+        private void CalculateFromSignature(object sender, RoutedEventArgs e)
         {
             throw new NotImplementedException();
+
         }
     }
 }

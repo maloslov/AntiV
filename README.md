@@ -11,6 +11,6 @@ Plan:
 
 	2. :black_square_button: BaseLoader loads bases to server.
 
-	3. :black_square_button: BaseEditor reads and writes data in bases.
+	3. :ballot_box_with_check: BaseEditor reads and writes data in bases.
 
 3. :black_square_button: Next step

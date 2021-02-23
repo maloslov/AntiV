@@ -29,29 +29,30 @@
                         <ColumnDefinition MinWidth="80"/>
                     </Grid.ColumnDefinitions>
                     <Label Content="Virus name:" Grid.Row="0" Grid.Column="0"/>
-                    <ComboBox IsEditable="True" Grid.Row="1" Grid.Column="0"></ComboBox>
+                    <ComboBox x:Name="boxName" IsEditable="True" Grid.Row="1" Grid.Column="0"></ComboBox>
                     <Label Content="File type:" Grid.Row="0" Grid.Column="1"/>
-                    <ComboBox Grid.Row="1" Grid.Column="1" IsEditable="True" ></ComboBox>
+                    <ComboBox x:Name="boxType" Grid.Row="1" Grid.Column="1" IsEditable="True" ></ComboBox>
                     <Label Content="Signature:" Grid.Row="0" Grid.Column="2"></Label>
-                    <ComboBox Grid.Row="1" Grid.Column="2" IsEditable="True"></ComboBox>
+                    <ComboBox x:Name="boxSign" Grid.Row="1" Grid.Column="2" IsEditable="True"></ComboBox>
                     <Label Content="Length:" Grid.Row="0" Grid.Column="3"/>
-                    <ComboBox Grid.Row="1" Grid.Column="3" IsEditable="True"></ComboBox>
+                    <ComboBox x:Name="boxLen" Grid.Row="1" Grid.Column="3" IsEditable="True"></ComboBox>
                     <Label Content="Hash:" Grid.Row="0" Grid.Column="4"/>
-                    <ComboBox Grid.Row="1" Grid.Column="4" IsEditable="True"></ComboBox>
+                    <ComboBox x:Name="boxHash" Grid.Row="1" Grid.Column="4" IsEditable="True"></ComboBox>
                     <Label Content="Offset start:" Grid.Row="0" Grid.Column="5"/>
-                    <ComboBox Grid.Row="1" Grid.Column="5" IsEditable="True"></ComboBox>
+                    <ComboBox x:Name="boxStart" Grid.Row="1" Grid.Column="5" IsEditable="True"></ComboBox>
                     <Label Content="Offset end:" Grid.Row="0" Grid.Column="6"/>
-                    <ComboBox Grid.Row="1" Grid.Column="6" IsEditable="True"></ComboBox>
+                    <ComboBox x:Name="boxEnd" Grid.Row="1" Grid.Column="6" IsEditable="True"></ComboBox>
                 </Grid>
             </TabItem>
             <TabItem Header="Calculate from malware code">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition MinWidth="200"/>
-                        <ColumnDefinition />
+                        <ColumnDefinition MinWidth="200" Width="57*"/>
+                        <ColumnDefinition Width="236*"/>
+                        <ColumnDefinition Width="293*" />
                     </Grid.ColumnDefinitions>
-                    <TextBox Grid.Column="0" Margin="5,5,5,5" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto"/>
-                    <Button Grid.Column="1" Margin="5,5,5,5" Content="Calculate" Click="CalculateMalwareData"/>
+                    <TextBox IsEnabled="False" x:Name="boxCalc" Grid.Column="0" Margin="5,5,5,5" TextWrapping="Wrap" VerticalScrollBarVisibility="Auto" Grid.ColumnSpan="2"/>
+                    <Button Grid.Column="2" Margin="5,5,5,5" Content="Calculate"/>
                 </Grid>
             </TabItem>
             <TabItem Header="Smth else"/>
