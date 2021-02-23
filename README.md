@@ -9,8 +9,8 @@ Plan:
 
 	1. :black_square_button: Bases contains filetype, signature, length, hash, offset start and end.
 
-	2. :black_square_button: BaseLoader loads bases to server.
+	2. :black_square_button: Base Loader loads data to server.
 
-	3. :ballot_box_with_check: BaseEditor reads and writes data in bases.
+	3. :ballot_box_with_check: Base Editor reads and writes data in file.
 
 3. :black_square_button: Next step
