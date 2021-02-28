@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -31,17 +30,20 @@ namespace AVBaseEditor
         {
             InitializeComponent();
             Base = new List<BaseRecord>();
+            
             dataGrid.ItemsSource = Base;
             //Test Example
+            
             for (int i = 0; i < 5; i++)
             {
-                Base.Add(new BaseRecord("Petya", "exe", 0b_1010_1010, 25, 5465656, 1, 56));
+                Base.Add(new BaseRecord("Petya", "exe", 170, 25, 5465656, 1, 56));
                 Base.Add(new BaseRecord("Vanya", "txt", 0b_1110_1010, 25, 5465321, 2, 16));
                 Base.Add(new BaseRecord("Sasha", "png", 0b_0110_1011, 27, 5466235, 21, 26));
                 Base.Add(new BaseRecord("Misha", "mp3", 0b_1011_1011, 27, 5456173, 11, 26));
                 Base.Add(new BaseRecord("Pasha", "mp4", 0b_1011_1111, 29, 5656213, 12, 15));
                 Base.Add(new BaseRecord("Maxim", "pdf", 0b_1011_0110, 28, 4656978, 14, 51));
             }
+            
         }
 
         private void MenuItemDelete_Click(object sender, RoutedEventArgs e)
@@ -77,21 +79,52 @@ namespace AVBaseEditor
             }
 
             Base.Clear();
-            int c = fs.ReadByte();
-            while(c != -1)
+            int count = fs.ReadByte();
+            while(count != -1)
             {
-                if(c==10 || c == 13) //CR or LF
-                {
-                    c = fs.ReadByte();
-                    if (buffer.Length > 7)
-                        Base.Add(new BaseRecord(buffer));
-                    buffer = new byte[0];
-                    continue;
+                byte[] name = new byte[0],
+                    type = new byte[0],
+                    sign = new byte[0],
+                    len = new byte[0],
+                    hash = new byte[0],
+                    start = new byte[0],
+                    end = new byte[0];
+                for (int i = 0; i < 7; i++) {
+                    for (int j = 0; j < count; j++)
+                    {
+                        switch (i)
+                        {
+                            case 0:
+                                name = name.Append((byte)fs.ReadByte()).ToArray();
+                                break;
+                            case 1:
+                                type = type.Append((byte)fs.ReadByte()).ToArray();
+                                break;
+                            case 2:
+                                sign = sign.Append((byte)fs.ReadByte()).ToArray();
+                                break;
+                            case 3:
+                                len = len.Append((byte)fs.ReadByte()).ToArray();
+                                break;
+                            case 4:
+                                hash = hash.Append((byte)fs.ReadByte()).ToArray();
+                                break;
+                            case 5:
+                                start = start.Append((byte)fs.ReadByte()).ToArray();
+                                break;
+                            case 6:
+                                end = end.Append((byte)fs.ReadByte()).ToArray();
+                                break;
+                        }
+                    }
+                    count = fs.ReadByte();
                 }
-                buffer = buffer.Append((byte)c).ToArray();
-
-                c = fs.ReadByte();
-
+                Base.Add(new BaseRecord(btos(name), btos(type),
+                    BitConverter.ToUInt32(sign, 0), 
+                    BitConverter.ToUInt32(len, 0),
+                    BitConverter.ToUInt32(hash, 0), 
+                    BitConverter.ToUInt32(start, 0),
+                    BitConverter.ToUInt32(end, 0)));
             }
             dataGrid.Items.Refresh();
         }
@@ -134,13 +167,10 @@ namespace AVBaseEditor
                     FileMode.CreateNew);
                 fs.Write(stob(Sign), 0, Sign.Length);
             }
-            byte[] buffer = BitConverter.GetBytes(recordCount).Concat(stob("\r\n")).ToArray();
-            fs.Write(buffer, 0, buffer.Length);
             foreach(var r in Base)
             {
                 byte[] record = r.ToBytes();
                 fs.Write(record, 0, record.Length);
-                fs.Write(stob("\r\n"), 0, 2);
             }
         }
         public static string btos(byte[] bytes)
@@ -167,7 +197,7 @@ namespace AVBaseEditor
                 && boxEnd.Text.Length > 0)
             {
                 var record = new BaseRecord(boxName.Text, boxType.Text,
-                    Convert.ToByte(boxSign.Text),
+                    Convert.ToUInt32(boxSign.Text),
                     Convert.ToUInt32(boxLen.Text),
                     Convert.ToUInt32(boxHash.Text),
                     Convert.ToUInt32(boxStart.Text),

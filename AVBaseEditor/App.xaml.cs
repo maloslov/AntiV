@@ -18,19 +18,28 @@ namespace AVBaseEditor
     {
         public string VirusName { get; set; }
         public string FileType { get; set; }
-        public byte Signature { get; set; }
+        public UInt32 Signature { get; set; }
         public UInt32 Length { get; set; }
         public UInt32 Hash { get; set; }
         public UInt32 OffsetStart { get; set; }
         public UInt32 OffsetEnd { get; set; }
 
         public BaseRecord(string VirusName, string FileType,
-            byte Signature, UInt32 Length, UInt32 Hash,
+            UInt32 Signature, UInt32 Length, UInt32 Hash,
             UInt32 OffsetStart, UInt32 OffsetEnd)
         {
             this.VirusName = VirusName;
             this.FileType = FileType;
-            this.Signature = Signature;
+            this.Signature = new UInt32();
+            var b = BitConverter.GetBytes(Signature);
+            if(b.Length > 8)
+            {
+                this.Signature = BitConverter.ToUInt32(b.Take(8).ToArray(), 0);
+            }
+            else
+            {
+                this.Signature = BitConverter.ToUInt32(b,0);
+            }
             this.Length = Length;
             //System.Security.Cryptography.SHA256 sha;
             this.Hash = Hash;
@@ -38,60 +47,27 @@ namespace AVBaseEditor
             this.OffsetEnd = OffsetEnd;
         }
 
-        public BaseRecord(byte[] record)
-        {
-            byte state = 0;
-            var val = new byte[0];
-            foreach (byte b in record)
-            {
-                if (b != 9) //tab
-                {
-                    val = val.Append(b).ToArray();
-                    continue;
-                }
-                state++;
-
-                if (val.Length > 0)
-                    switch (state)
-                    {
-                        case 1:
-                            VirusName = MainWindow.btos(val);
-                            break;
-                        case 2:
-                            FileType = MainWindow.btos(val);
-                            break;
-                        case 3:
-                            Signature = val[0];
-                            break;
-                        case 4:
-                            Length = BitConverter.ToUInt32(val, 0);
-                            break;
-                        case 5:
-                            Hash = BitConverter.ToUInt32(val, 0);
-                            break;
-                        case 6:
-                            OffsetStart = BitConverter.ToUInt32(val, 0);
-                            break;
-                        case 7:
-                            OffsetEnd = BitConverter.ToUInt32(val, 0);
-                            break;
-                    }
-                val = new byte[0];
-            }
-        }
-
         public byte[] ToBytes()
         {
-            byte[] lenbytes = BitConverter.GetBytes(Length).ToArray(),
-                hashbytes = BitConverter.GetBytes(Hash).ToArray(),
-                startbytes = BitConverter.GetBytes(OffsetStart).ToArray(),
-                endbytes = BitConverter.GetBytes(OffsetEnd).ToArray();
+            byte[] name = MainWindow.stob(VirusName),
+                type = MainWindow.stob(FileType),
+                sign = BitConverter.GetBytes(Signature),
+                lenbytes = BitConverter.GetBytes(Length),
+                hashbytes = BitConverter.GetBytes(Hash),
+                startbytes = BitConverter.GetBytes(OffsetStart),
+                endbytes = BitConverter.GetBytes(OffsetEnd);
 
-            byte[] res = MainWindow.stob(VirusName+'\t').Concat(
-                MainWindow.stob(FileType+'\t')).Append(Signature).Append(
-                (byte)9).Concat(lenbytes).Append((byte)9).Concat(hashbytes).Append(
-                (byte)9).Concat(startbytes).Append((byte)9).Concat(endbytes).Append(
-                (byte)9).ToArray();
+ //           while (sign.Length < 8)
+   //             sign = sign.Prepend((byte)0).ToArray();
+
+            var res = new byte[0];
+            res = res.Append((byte)name.Length).Concat(name).Append(
+                (byte)type.Length).Concat(type).Append(
+                (byte)sign.Length).Concat(sign).Append(
+                (byte)lenbytes.Length).Concat(lenbytes).Append(
+                (byte)hashbytes.Length).Concat(hashbytes).Append(
+                (byte)startbytes.Length).Concat(startbytes).Append(
+                (byte)endbytes.Length).Concat(endbytes).ToArray();
             return res;
         }
     }

@@ -82,11 +82,11 @@
                     </ContextMenu>
                 </DataGrid.ContextMenu>
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Virus name" Binding="{Binding VirusName}" MinWidth="90"/>
-                    <DataGridTextColumn Header="File type" Binding="{Binding FileType}" MinWidth="70"/>
-                    <DataGridTextColumn Header="Virus signature" Binding="{Binding Signature}" MinWidth="90"/>
-                    <DataGridTextColumn Header="All virus length" Binding="{Binding Length}" MinWidth="90"/>
-                    <DataGridTextColumn Header="All virus hash" Binding="{Binding Hash}" MinWidth="90"/>
+                    <DataGridTextColumn Header="Name" Binding="{Binding VirusName}" MinWidth="80"/>
+                    <DataGridTextColumn Header="Type" Binding="{Binding FileType}" MinWidth="80"/>
+                    <DataGridTextColumn Header="Signature" Binding="{Binding Signature}" MinWidth="80"/>
+                    <DataGridTextColumn Header="Length" Binding="{Binding Length}" MinWidth="80"/>
+                    <DataGridTextColumn Header="Hash" Binding="{Binding Hash}" MinWidth="80"/>
                     <DataGridTextColumn Header="Offset start" Binding="{Binding OffsetStart}" MinWidth="70"/>
                     <DataGridTextColumn Header="Offset end" Binding="{Binding OffsetEnd}" MinWidth="70"/>
                 </DataGrid.Columns>
