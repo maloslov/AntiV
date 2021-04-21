@@ -20,12 +20,19 @@ namespace ServiceConsole
 
     class Base
     {
+        public ulong minOffStart;
+        public ulong maxOffEnd;
+        public ulong maxLength;
         private Dictionary<ulong, Record> mybase;
         private string path;
+
         public Base(string basePath)
         {
             path = basePath;
             mybase = new Dictionary<ulong, Record>();
+            minOffStart = 0;
+            maxOffEnd = 0;
+            maxLength = 8;
         }
         public bool isFound(ulong hashKey, ulong offStart, string name)
         {
@@ -94,6 +101,7 @@ namespace ServiceConsole
                                 buf[j] = (byte)f.Read();
                             }
                             r.signLength = (BitConverter.ToUInt64(buf, 0));
+                            maxLength = r.signLength > maxLength ? r.signLength : maxLength;
 
                             //read offset start
                             len = f.Read();
@@ -103,6 +111,7 @@ namespace ServiceConsole
                                 buf[j] = (byte)f.Read();
                             }
                             r.offsetStart = BitConverter.ToUInt64(buf, 0);
+                            minOffStart = minOffStart > r.offsetStart ? r.offsetStart : minOffStart;
 
                             //read offset end
                             len = f.Read();
@@ -112,10 +121,14 @@ namespace ServiceConsole
                                 buf[j] = (byte)f.Read();
                             }
                             r.offsetEnd = BitConverter.ToUInt64(buf, 0);
+                            maxOffEnd = maxOffEnd < r.offsetEnd ? r.offsetEnd : maxOffEnd;
+
                             mybase.Add(r.hash, r);
                         }
                     }
             }
         }
+
+
     }
 }

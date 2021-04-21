@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO.Pipes;
 using System.Linq;
 using System.Security.AccessControl;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
@@ -12,7 +13,9 @@ namespace ServiceConsole
     class Program
     {
         private static byte status;
+        private static System.Timers.Timer timer1;
         private static Base mybase;
+        private static SHA256 sha256;
         private static List<Thread> threads;
         private static List<string> pendingFiles;
         private static List<string> monitoringDirs;
@@ -30,15 +33,19 @@ namespace ServiceConsole
             pendingFiles = new List<string>();
             monitoringDirs = new List<string>();
             planningScan = new List<string[]>();
+            timer1 = new System.Timers.Timer(60000);
+            timer1.Elapsed += new System.Timers.ElapsedEventHandler(checkTime);
             foreach (var t in threads)
                 t.Start();
         }
 
         protected static void OnStop()
         {
+            status = 0;
             foreach (var t in threads)
                 if (t.IsAlive)
                     t.Abort();
+
         }
 
         private static void ListenPipe()
@@ -70,6 +77,11 @@ namespace ServiceConsole
                     pipe.Write(str, 0, str.Length);
                 }
             }
+        }
+
+        static void checkTime(object sender, System.Timers.ElapsedEventArgs e)
+        {
+
         }
     }
 }

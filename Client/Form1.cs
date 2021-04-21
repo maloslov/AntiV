@@ -16,8 +16,7 @@ namespace Client
 {
     public partial class Form1 : Form
     {
-        //private NamedPipeClientStream pipe;
-        private List<Task> threads;
+        private List<Thread> threads;
         private string message;
 
         public Form1()
@@ -25,10 +24,9 @@ namespace Client
             InitializeComponent();
             timer1.Start();
             message = "";
-            threads = new List<Task>();
-            threads.Add(new Task(pipeStreamer));
+            threads = new List<Thread>();
+            threads.Add(new Thread(pipeStreamer));
             threads[0].Start();
-            //pipeStreamer();
         }
 
         #region General
@@ -89,12 +87,16 @@ namespace Client
 
         private void btnFile_Click(object sender, EventArgs e)
         {
-
+            if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
+                return;
+            textPath.Text = openFileDialog1.FileName.ToLower();
         }
 
         private void btnFolder_Click(object sender, EventArgs e)
         {
-
+            if (folderBrowserDialog1.ShowDialog() == DialogResult.Cancel)
+                return;
+            textPath.Text = folderBrowserDialog1.SelectedPath.ToLower();
         }
 
         private void btnScanStart_Click(object sender, EventArgs e)
@@ -107,6 +109,14 @@ namespace Client
 
         }
 
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            foreach(var t in threads)
+            {
+                t.Abort();
+            }
+        }
+
         private void timer1_Tick(object sender, EventArgs e)
         {
             checkService();
@@ -116,6 +126,7 @@ namespace Client
                 message = "";
             }
         }
+
         private void pipeStreamer()
         {
             using (var pipe = new NamedPipeClientStream(
@@ -145,26 +156,93 @@ namespace Client
                 }
             }
         }
-        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            foreach(var t in threads)
-            {
-                t.Wait();//Abort();
-            }
-        }
         #endregion
 
         #region Scanning
 
+        private void btnAddScan_Click(object sender, EventArgs e)
+        {
+            if (textPath.Text.Length > 0)
+            {
+                foreach (DataGridViewRow r in dataScan.Rows)
+                {
+                    if (r.Cells[0].Value.Equals(textPath.Text))
+                        return;
+                }
+                dataScan.Rows.Add(textPath.Text,"added");
+            }
+        }
+
+        private void btnDelScan_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow r in dataScan.Rows)
+            {
+                if (r.Selected)
+                    dataScan.Rows.Remove(r);
+            }
+        }
         #endregion
 
         #region Monitoring
 
+        private void btnAddMonitor_Click(object sender, EventArgs e)
+        {
+            if (textPath.Text.Length > 0)
+            {
+                var str = textPath.Text.Substring(0,textPath.Text.LastIndexOf('\\'));
+                foreach(DataGridViewRow r in dataMonitor.Rows)
+                {
+                    if (r.Cells[0].Value.Equals(str))
+                        return;
+                }
+                dataMonitor.Rows.Add(str);
+            }
+        }
+
+        private void btnDelMonitor_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow r in dataMonitor.Rows)
+            {
+                if (r.Selected)
+                    dataMonitor.Rows.Remove(r);
+            }
+        }
         #endregion
 
         #region Planning
 
+        private void btnAddPlan_Click(object sender, EventArgs e)
+        {
+            if (textPath.Text.Length > 0)
+            {
+                var time = String.Format("{0}:{1}{2}"
+                    , comboHour.Text
+                    , comboMinute1.Text
+                    , comboMinute2.Text);
+                foreach (DataGridViewRow r in dataPlan.Rows)
+                {
+                    if (r.Cells[0].Value.Equals(textPath.Text)
+                        && r.Cells[1].Value.Equals(time))
+                        return;
+                }
+                dataPlan.Rows.Add(textPath.Text, time);
+            }
+
+        }
+
+        private void btnDelPlan_Click(object sender, EventArgs e)
+        {
+            foreach(DataGridViewRow r in dataPlan.Rows)
+            {
+                if (r.Selected)
+                    dataPlan.Rows.Remove(r);
+            }
+        }
         #endregion
 
+        private void comboHour_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            e.Handled = true;
+        }
     }
 }
