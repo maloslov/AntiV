@@ -32,6 +32,8 @@ namespace BaseEditor
             this.components = new System.ComponentModel.Container();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tabPage2 = new System.Windows.Forms.TabPage();
+            this.textType = new System.Windows.Forms.TextBox();
+            this.label11 = new System.Windows.Forms.Label();
             this.textEnd = new System.Windows.Forms.TextBox();
             this.textStart = new System.Windows.Forms.TextBox();
             this.textLength = new System.Windows.Forms.TextBox();
@@ -48,13 +50,8 @@ namespace BaseEditor
             this.saveBase = new System.Windows.Forms.Button();
             this.openBase = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
-            this.MalName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Prefix = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Hash = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Length = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.OStart = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.OEnd = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage1 = new System.Windows.Forms.TabPage();
+            this.btnParse = new System.Windows.Forms.Button();
             this.textExe = new System.Windows.Forms.RichTextBox();
             this.label4 = new System.Windows.Forms.Label();
             this.textCPath = new System.Windows.Forms.TextBox();
@@ -69,7 +66,13 @@ namespace BaseEditor
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.btnParse = new System.Windows.Forms.Button();
+            this.MalName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FileType = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Prefix = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Hash = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Length = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.OStart = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.OEnd = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabControl1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -91,6 +94,8 @@ namespace BaseEditor
             // 
             // tabPage2
             // 
+            this.tabPage2.Controls.Add(this.textType);
+            this.tabPage2.Controls.Add(this.label11);
             this.tabPage2.Controls.Add(this.textEnd);
             this.tabPage2.Controls.Add(this.textStart);
             this.tabPage2.Controls.Add(this.textLength);
@@ -115,18 +120,34 @@ namespace BaseEditor
             this.tabPage2.Text = "Base edit";
             this.tabPage2.UseVisualStyleBackColor = true;
             // 
+            // textType
+            // 
+            this.textType.Location = new System.Drawing.Point(306, 56);
+            this.textType.Name = "textType";
+            this.textType.Size = new System.Drawing.Size(104, 20);
+            this.textType.TabIndex = 17;
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.Location = new System.Drawing.Point(251, 59);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(49, 13);
+            this.label11.TabIndex = 16;
+            this.label11.Text = "File type:";
+            // 
             // textEnd
             // 
-            this.textEnd.Location = new System.Drawing.Point(240, 56);
+            this.textEnd.Location = new System.Drawing.Point(193, 56);
             this.textEnd.Name = "textEnd";
-            this.textEnd.Size = new System.Drawing.Size(100, 20);
+            this.textEnd.Size = new System.Drawing.Size(52, 20);
             this.textEnd.TabIndex = 15;
             // 
             // textStart
             // 
             this.textStart.Location = new System.Drawing.Point(69, 56);
             this.textStart.Name = "textStart";
-            this.textStart.Size = new System.Drawing.Size(100, 20);
+            this.textStart.Size = new System.Drawing.Size(56, 20);
             this.textStart.TabIndex = 14;
             // 
             // textLength
@@ -169,7 +190,7 @@ namespace BaseEditor
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(175, 59);
+            this.label9.Location = new System.Drawing.Point(128, 59);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(59, 13);
             this.label9.TabIndex = 8;
@@ -215,7 +236,7 @@ namespace BaseEditor
             // 
             this.addRow.Location = new System.Drawing.Point(251, 82);
             this.addRow.Name = "addRow";
-            this.addRow.Size = new System.Drawing.Size(156, 38);
+            this.addRow.Size = new System.Drawing.Size(159, 38);
             this.addRow.TabIndex = 3;
             this.addRow.Text = "Add row to base";
             this.addRow.UseVisualStyleBackColor = true;
@@ -243,6 +264,7 @@ namespace BaseEditor
             // 
             // dataGridView1
             // 
+            this.dataGridView1.AllowUserToAddRows = false;
             this.dataGridView1.AllowUserToOrderColumns = true;
             this.dataGridView1.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
@@ -250,6 +272,7 @@ namespace BaseEditor
             this.dataGridView1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataGridView1.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.MalName,
+            this.FileType,
             this.Prefix,
             this.Hash,
             this.Length,
@@ -259,42 +282,6 @@ namespace BaseEditor
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.Size = new System.Drawing.Size(407, 286);
             this.dataGridView1.TabIndex = 0;
-            // 
-            // MalName
-            // 
-            this.MalName.HeaderText = "Malware name";
-            this.MalName.Name = "MalName";
-            this.MalName.Width = 70;
-            // 
-            // Prefix
-            // 
-            this.Prefix.HeaderText = "Signature prefix";
-            this.Prefix.Name = "Prefix";
-            this.Prefix.Width = 60;
-            // 
-            // Hash
-            // 
-            this.Hash.HeaderText = "SHA-256 without prefix";
-            this.Hash.Name = "Hash";
-            this.Hash.Width = 80;
-            // 
-            // Length
-            // 
-            this.Length.HeaderText = "Signature length";
-            this.Length.Name = "Length";
-            this.Length.Width = 50;
-            // 
-            // OStart
-            // 
-            this.OStart.HeaderText = "Offset start";
-            this.OStart.Name = "OStart";
-            this.OStart.Width = 50;
-            // 
-            // OEnd
-            // 
-            this.OEnd.HeaderText = "Offset end";
-            this.OEnd.Name = "OEnd";
-            this.OEnd.Width = 50;
             // 
             // tabPage1
             // 
@@ -316,6 +303,16 @@ namespace BaseEditor
             this.tabPage1.TabIndex = 0;
             this.tabPage1.Text = "Malware file";
             this.tabPage1.UseVisualStyleBackColor = true;
+            // 
+            // btnParse
+            // 
+            this.btnParse.Location = new System.Drawing.Point(247, 59);
+            this.btnParse.Name = "btnParse";
+            this.btnParse.Size = new System.Drawing.Size(166, 32);
+            this.btnParse.TabIndex = 11;
+            this.btnParse.Text = "Parse chosen signature";
+            this.btnParse.UseVisualStyleBackColor = true;
+            this.btnParse.Click += new System.EventHandler(this.btnParse_Click);
             // 
             // textExe
             // 
@@ -413,15 +410,47 @@ namespace BaseEditor
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // btnParse
+            // MalName
             // 
-            this.btnParse.Location = new System.Drawing.Point(247, 59);
-            this.btnParse.Name = "btnParse";
-            this.btnParse.Size = new System.Drawing.Size(166, 32);
-            this.btnParse.TabIndex = 11;
-            this.btnParse.Text = "Parse chosen signature";
-            this.btnParse.UseVisualStyleBackColor = true;
-            this.btnParse.Click += new System.EventHandler(this.btnParse_Click);
+            this.MalName.HeaderText = "Malware name";
+            this.MalName.Name = "MalName";
+            this.MalName.Width = 60;
+            // 
+            // FileType
+            // 
+            this.FileType.HeaderText = "File type";
+            this.FileType.Name = "FileType";
+            this.FileType.Width = 30;
+            // 
+            // Prefix
+            // 
+            this.Prefix.HeaderText = "Signature prefix";
+            this.Prefix.Name = "Prefix";
+            this.Prefix.Width = 60;
+            // 
+            // Hash
+            // 
+            this.Hash.HeaderText = "SHA-256 without prefix";
+            this.Hash.Name = "Hash";
+            this.Hash.Width = 60;
+            // 
+            // Length
+            // 
+            this.Length.HeaderText = "Signature length";
+            this.Length.Name = "Length";
+            this.Length.Width = 60;
+            // 
+            // OStart
+            // 
+            this.OStart.HeaderText = "Offset start";
+            this.OStart.Name = "OStart";
+            this.OStart.Width = 50;
+            // 
+            // OEnd
+            // 
+            this.OEnd.HeaderText = "Offset end";
+            this.OEnd.Name = "OEnd";
+            this.OEnd.Width = 50;
             // 
             // Form1
             // 
@@ -476,13 +505,16 @@ namespace BaseEditor
         private System.ComponentModel.BackgroundWorker backgroundWorker1;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.RichTextBox textExe;
+        private System.Windows.Forms.Button btnParse;
+        private System.Windows.Forms.TextBox textType;
+        private System.Windows.Forms.Label label11;
         private System.Windows.Forms.DataGridViewTextBoxColumn MalName;
+        private System.Windows.Forms.DataGridViewTextBoxColumn FileType;
         private System.Windows.Forms.DataGridViewTextBoxColumn Prefix;
         private System.Windows.Forms.DataGridViewTextBoxColumn Hash;
         private System.Windows.Forms.DataGridViewTextBoxColumn Length;
         private System.Windows.Forms.DataGridViewTextBoxColumn OStart;
         private System.Windows.Forms.DataGridViewTextBoxColumn OEnd;
-        private System.Windows.Forms.Button btnParse;
     }
 }
 

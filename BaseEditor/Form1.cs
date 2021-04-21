@@ -78,10 +78,10 @@ namespace BaseEditor
                     textPrefix.AppendText(str[i]+'|');
                 }
                 textPrefix.Text = textPrefix.Text.Trim('|');
-                var buf = new byte[str.Length - 8];
-                for(int i = 8; i < str.Length; i++)
+                var buf = new byte[str.Length];
+                for(int i = 0; i < str.Length; i++)
                 {
-                    buf[i - 8] = Byte.Parse(str[i]);
+                    buf[i] = Byte.Parse(str[i]);
                 }
                 using(var hash = SHA256.Create())
                 {
@@ -89,6 +89,7 @@ namespace BaseEditor
                         = String.Format("{0}",
                         BitConverter.ToUInt64(hash.ComputeHash(buf),0));
                 }
+                textType.Text = textCPath.Text.Substring(textCPath.Text.LastIndexOf('.'));
                 tabControl1.SelectedTab = tabPage2;
             }
         }
@@ -96,7 +97,7 @@ namespace BaseEditor
         #region tab1
         private void openBase_Click(object sender, EventArgs e)
         {
-            //try
+            dataGridView1.Rows.Clear();
             {
                 openFileDialog1.Filter = "AVBase file|*.avb";
                 if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
@@ -112,7 +113,7 @@ namespace BaseEditor
                         && buf[3] == 'o' && buf[4] == 'v'))
                         return;
                     int rows = BitConverter.ToInt32(buf,5);
-                    for (int i = 0; i < rows-1; i++)
+                    for (int i = 0; i < rows; i++)
                     {
                         dataGridView1.Rows.Add();
                         //read name
@@ -124,7 +125,17 @@ namespace BaseEditor
                         }
                         dataGridView1.Rows[i].Cells[0].Value 
                             = Encoding.ASCII.GetString(buf);
-                        
+
+                        //read file type
+                        len = f.Read();
+                        buf = new byte[len];
+                        for (int j = 0; j < len; j++)
+                        {
+                            buf[j] = (byte)f.Read();
+                        }
+                        dataGridView1.Rows[i].Cells[1].Value
+                            = Encoding.ASCII.GetString(buf);
+
                         //read prefix
                         len = f.Read();
                         var str = "";
@@ -132,7 +143,7 @@ namespace BaseEditor
                         {
                             str += Convert.ToString(f.Read())+'|';
                         }
-                        dataGridView1.Rows[i].Cells[1].Value 
+                        dataGridView1.Rows[i].Cells[2].Value 
                             = str.Substring(0,str.Length-1);
                         
                         //read hash
@@ -142,7 +153,7 @@ namespace BaseEditor
                         {
                             buf[j] =(byte) f.Read();
                         }
-                        dataGridView1.Rows[i].Cells[2].Value 
+                        dataGridView1.Rows[i].Cells[3].Value 
                             = (BitConverter.ToUInt64(buf,0));
 
                         //read length
@@ -152,7 +163,7 @@ namespace BaseEditor
                         {
                             buf[j] = (byte)f.Read();
                         }
-                        dataGridView1.Rows[i].Cells[3].Value 
+                        dataGridView1.Rows[i].Cells[4].Value 
                             = (BitConverter.ToUInt64(buf,0));
 
                         //read offset start
@@ -162,7 +173,7 @@ namespace BaseEditor
                         {
                             buf[j] = (byte)f.Read();
                         }
-                        dataGridView1.Rows[i].Cells[4].Value 
+                        dataGridView1.Rows[i].Cells[5].Value 
                             = BitConverter.ToUInt64(buf,0);
 
                         //read offset end
@@ -172,7 +183,7 @@ namespace BaseEditor
                         {
                             buf[j] = (byte)f.Read();
                         }
-                        dataGridView1.Rows[i].Cells[5].Value 
+                        dataGridView1.Rows[i].Cells[6].Value 
                             = BitConverter.ToUInt64(buf, 0);
                     }
                 }
@@ -196,15 +207,20 @@ namespace BaseEditor
                 f.Write(buf, 0, buf.Length);
                 foreach (DataGridViewRow r in dataGridView1.Rows)
                 {
-                    if (r.Index == dataGridView1.RowCount - 1) break;
+                    if (r.Index == dataGridView1.RowCount) break;
 
                     //write name
                     string str = (string)r.Cells[0].Value;
                     f.WriteByte(Convert.ToByte(str.Length));
                     f.Write(Encoding.ASCII.GetBytes(str), 0, str.Length);
 
+                    //write filetype
+                    str = (string)r.Cells[1].Value;
+                    f.WriteByte(Convert.ToByte(str.Length));
+                    f.Write(Encoding.ASCII.GetBytes(str), 0, str.Length);
+
                     //write prefix
-                    var s = ((string)r.Cells[1].Value).Split('|');
+                    var s = ((string)r.Cells[2].Value).Split('|');
                     f.WriteByte((byte)s.Length);
                     for (int i = 0; i < s.Length; i++)
                     {
@@ -212,25 +228,25 @@ namespace BaseEditor
                     }
 
                     //write hash
-                    var h = Convert.ToUInt64((string)r.Cells[2].Value);
+                    var h = Convert.ToUInt64(r.Cells[3].Value);
                     buf = BitConverter.GetBytes(h);
                     f.WriteByte((byte)buf.Length);
                     f.Write(buf, 0, buf.Length);
 
                     //write length
-                    h = Convert.ToUInt64((string)r.Cells[3].Value);
+                    h = Convert.ToUInt64(r.Cells[4].Value);
                     buf = BitConverter.GetBytes(h);
                     f.WriteByte((byte)buf.Length);
                     f.Write(buf, 0, buf.Length);
 
                     //write offset start
-                    h = Convert.ToUInt64((string)r.Cells[4].Value);
+                    h = Convert.ToUInt64(r.Cells[5].Value);
                     buf = BitConverter.GetBytes(h);
                     f.WriteByte((byte)buf.Length);
                     f.Write(buf, 0, buf.Length);
 
                     //write offset end
-                    h = Convert.ToUInt64((string)r.Cells[5].Value);
+                    h = Convert.ToUInt64(r.Cells[6].Value);
                     buf = BitConverter.GetBytes(h);
                     f.WriteByte((byte)buf.Length);
                     f.Write(buf, 0, buf.Length);
@@ -240,7 +256,23 @@ namespace BaseEditor
 
         private void addRow_Click(object sender, EventArgs e)
         {
+            if(textPrefix.Text.Trim('|').Split('|').Length!=8 
+                || textName.Text.Length < 1 || textStart.Text.Length<1
+                || textEnd.Text.Length<1 || textHash.Text.Length<1
+                || textLength.Text.Length < 1) 
+            { return; }
 
+            try
+            {
+                dataGridView1.Rows.Add(textName.Text,
+                    textType.Text,
+                    textPrefix.Text,
+                    Convert.ToUInt64(textHash.Text),
+                    Convert.ToUInt64(textLength.Text),
+                    Convert.ToUInt64(textStart.Text),
+                    Convert.ToUInt64(textEnd.Text));
+            }
+            catch (Exception) { }
         }
 
         #endregion

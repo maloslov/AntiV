@@ -1,30 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO.Pipes;
+using System.Linq;
 using System.Security.AccessControl;
 using System.Security.Principal;
-using System.ServiceProcess;
 using System.Text;
 using System.Threading;
 
-namespace Service
+namespace ServiceConsole
 {
-    public partial class Service1 : ServiceBase
+    class Program
     {
-        private byte status;
-        private Base mybase;
-        private List<Thread> threads;
-        private List<string> pendingFiles;
-        private List<string> monitoringDirs;
-        private List<string[]> planningScan;
+        private static byte status;
+        private static Base mybase;
+        private static List<Thread> threads;
+        private static List<string> pendingFiles;
+        private static List<string> monitoringDirs;
+        private static List<string[]> planningScan;
 
-        public Service1()
-        {
-            InitializeComponent();
-        }
 
-        protected override void OnStart(string[] args)
+        protected static void Main(string[] args)
         {
+            Console.WriteLine("Starting");
             status = 1;
             mybase = new Base("c:\\antiv\\avdb.avb");
             threads = new List<Thread>();
@@ -37,38 +34,39 @@ namespace Service
                 t.Start();
         }
 
-        protected override void OnStop()
+        protected static void OnStop()
         {
             foreach (var t in threads)
                 if (t.IsAlive)
                     t.Abort();
         }
 
-        private void ListenPipe()
+        private static void ListenPipe()
         {
-                var pipeSecurity = new PipeSecurity();
-                pipeSecurity.SetAccessRule(
-                    new PipeAccessRule(
-                        new SecurityIdentifier(
-                            WellKnownSidType.BuiltinUsersSid
-                            , null
-                            ), PipeAccessRights.ReadWrite
-                            , AccessControlType.Allow));
+            var pipeSecurity = new PipeSecurity();
+            pipeSecurity.SetAccessRule(
+                new PipeAccessRule(
+                    new SecurityIdentifier(
+                        WellKnownSidType.BuiltinUsersSid
+                        , null
+                        ), PipeAccessRights.ReadWrite
+                        , AccessControlType.Allow));
             using (var pipe = new NamedPipeServerStream(
                 "\\.\\antiv1"
-                ,PipeDirection.InOut
-                ,1
-                ,PipeTransmissionMode.Message
-                ,PipeOptions.None
-                ,32,32
-                ,pipeSecurity
+                , PipeDirection.InOut
+                , 1
+                , PipeTransmissionMode.Message
+                , PipeOptions.None
+                , 32, 32
+                , pipeSecurity
                 ))
             {
                 while (status != 0)
                 {
-                    if(!pipe.IsConnected)
+                    if (!pipe.IsConnected)
                         pipe.WaitForConnection();
                     var str = Encoding.UTF8.GetBytes("AVService is running...");
+                    if(pipe.IsConnected)
                     pipe.Write(str, 0, str.Length);
                 }
             }
