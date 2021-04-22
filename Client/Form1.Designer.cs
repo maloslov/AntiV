@@ -156,6 +156,10 @@ namespace Client
             this.btnFolder.UseVisualStyleBackColor = true;
             this.btnFolder.Click += new System.EventHandler(this.btnFolder_Click);
             // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.Filter = "PE file|*.exe|ZIP-archive|*.zip";
+            // 
             // btnScanStart
             // 
             this.btnScanStart.Enabled = false;

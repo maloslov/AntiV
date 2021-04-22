@@ -16,17 +16,20 @@ namespace Client
 {
     public partial class Form1 : Form
     {
-        private List<Thread> threads;
-        private string message;
+        private bool closing;
+        private Thread tPipe;
+        private Queue<string> messageOut;
+        private Queue<string> messageIn;
 
         public Form1()
         {
             InitializeComponent();
             timer1.Start();
-            message = "";
-            threads = new List<Thread>();
-            threads.Add(new Thread(pipeStreamer));
-            threads[0].Start();
+            closing = false; 
+            messageOut = new Queue<string>();
+            messageIn = new Queue<string>();
+            tPipe = (new Thread(pipeStreamer));
+            tPipe.Start();
         }
 
         #region General
@@ -101,30 +104,26 @@ namespace Client
 
         private void btnScanStart_Click(object sender, EventArgs e)
         {
-
+            lock (messageOut)
+                messageOut.Enqueue("\u0000\u0003");
         }
 
         private void btnScanStop_Click(object sender, EventArgs e)
         {
-
+            lock (messageOut)
+                messageOut.Enqueue("\u0000\u0004");
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
-            foreach(var t in threads)
-            {
-                t.Abort();
-            }
+            closing = true;
+            while (tPipe.IsAlive) { }
         }
 
         private void timer1_Tick(object sender, EventArgs e)
         {
             checkService();
-            lock (message)
-            {
-                textLog.AppendText(message);
-                message = "";
-            }
+            commandParse();
         }
 
         private void pipeStreamer()
@@ -134,28 +133,80 @@ namespace Client
                 PipeDirection.InOut,
                 PipeOptions.None))
             {
-                while (true)
+                    byte[] buf;
+                while (!closing)
                 {
                     if (!pipe.IsConnected)
                     {
-                        //try
-                        {
-                            pipe.Connect();
-                        }
-                        /*catch (Exception e)
-                        {
-                            lock (message)
-                                message += e.ToString() + "\n";
-                        }*/
-                        var buf = new byte[32];
-                        pipe.Read(buf, 0, buf.Length);
-                        lock (message)
-                            message += "Connected to service\n"
-                                + Encoding.UTF8.GetString(buf);
+                        pipe.Connect();
+                        buf = new byte[] { 0, 11 };
+                        pipe.Write(buf, 0, buf.Length);
                     }
+                    buf = new byte[128];
+                    pipe.Read(buf, 0, buf.Length);
+
+                    lock (messageIn)
+                        messageIn.Enqueue(
+                            Encoding.UTF8.GetString(buf, 0, buf.Length));
+                    lock (messageOut)
+                    {
+                        if (messageOut.Count > 0)
+                            buf = Encoding.UTF8.GetBytes(messageOut.Dequeue());
+                        else buf = new byte[] { 0, 0 };
+                    }
+                    pipe.Write(buf, 0, buf.Length);
                 }
+                buf = new byte[128];
+                pipe.Read(buf, 0, buf.Length);
+                lock (messageIn)
+                    messageIn.Enqueue(
+                        Encoding.UTF8.GetString(buf, 0, buf.Length));
+                buf = new byte[] { 0, 1 };
+                pipe.Write(buf, 0, buf.Length);
+                pipe.WaitForPipeDrain();
             }
         }
+
+        private void commandParse()
+        {
+            string str = "\u0000\u0000";
+            lock (messageIn)
+                if (messageIn.Count > 0)
+                    str = messageIn.Dequeue();
+            switch (str[1])
+            {
+                case '\u0000':
+                    break;
+                case '\u0001': //error
+                    textLog.AppendText(String.Format(
+                        "Error: {0}\n", str.Substring(2)));
+                    break;
+                case '\u0002': //file scanning
+                    textLog.AppendText(String.Format(
+                        "Scanning file {0}\n", str.Substring(2)));
+                    break;
+                case '\u0003': //monitored new file
+                    textLog.AppendText(String.Format(
+                        "New file in {0}\n", str.Substring(2)));
+                    break;
+                case '\u0004': //if scanning
+                    btnScanStart.Enabled = true;
+                    btnScanStop.Enabled = false;
+                    textLog.AppendText("Scanner is working\n");
+                    break;
+                case '\u0005': //if not scanning
+                    btnScanStart.Enabled = false;
+                    btnScanStop.Enabled = true;
+                    textLog.AppendText("Scanner is stopped\n");
+                    break;
+                case '\u0006': //disconnect
+                    tPipe.Abort();
+                    tPipe.Start();
+                    textLog.AppendText("Disconnected\n");
+                    break;
+            }
+        }
+        
         #endregion
 
         #region Scanning
@@ -170,6 +221,8 @@ namespace Client
                         return;
                 }
                 dataScan.Rows.Add(textPath.Text,"added");
+                lock (messageOut)
+                    messageOut.Enqueue("\u0000\u0004" + textPath.Text);
             }
         }
 
@@ -179,6 +232,8 @@ namespace Client
             {
                 if (r.Selected)
                     dataScan.Rows.Remove(r);
+                lock (messageOut)
+                    messageOut.Enqueue("\u0000\u0005" + textPath.Text);
             }
         }
         #endregion
@@ -196,6 +251,8 @@ namespace Client
                         return;
                 }
                 dataMonitor.Rows.Add(str);
+                lock (messageOut)
+                    messageOut.Enqueue("\u0000\u0006" + str);
             }
         }
 
@@ -204,7 +261,11 @@ namespace Client
             foreach (DataGridViewRow r in dataMonitor.Rows)
             {
                 if (r.Selected)
+                {
                     dataMonitor.Rows.Remove(r);
+                    lock (messageOut)
+                        messageOut.Enqueue("\u0000\u0007" + r.Cells[0].Value);
+                }
             }
         }
         #endregion
@@ -226,16 +287,24 @@ namespace Client
                         return;
                 }
                 dataPlan.Rows.Add(textPath.Text, time);
+                lock (messageOut)
+                    messageOut.Enqueue("\u0000\u0008" 
+                        + textPath.Text + '|' + time);
             }
 
         }
 
         private void btnDelPlan_Click(object sender, EventArgs e)
         {
-            foreach(DataGridViewRow r in dataPlan.Rows)
+            foreach (DataGridViewRow r in dataPlan.Rows)
             {
                 if (r.Selected)
+                {
                     dataPlan.Rows.Remove(r);
+                    lock (messageOut)
+                        messageOut.Enqueue("\u0000\u0009" 
+                            + r.Cells[0].Value + '|' + r.Cells[1].Value);
+                }
             }
         }
         #endregion
