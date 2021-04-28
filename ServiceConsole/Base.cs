@@ -20,11 +20,11 @@ namespace ServiceConsole
 
     class Base
     {
-        public ulong minOffStart;
-        public ulong maxOffEnd;
-        public ulong maxLength;
-        private Dictionary<ulong, Record> mybase;
-        private string path;
+        public static long minOffStart;
+        public static long maxOffEnd;
+        public static long maxLength;
+        private static Dictionary<ulong, Record> mybase;
+        private static string path;
 
         public Base(string basePath)
         {
@@ -34,12 +34,26 @@ namespace ServiceConsole
             maxOffEnd = 0;
             maxLength = 8;
         }
-        public bool isFound(ulong hashKey, ulong offStart, string name)
+        public static List<string> isFound(byte[] maxSign, ulong offStart)
         {
+            var res = new List<string>();
+            for(int i = 8; i < maxSign.Length; i++)
+            {
+                var sign = new byte[i];
+                for (int j = 0; j < i; j++)
+                    sign[j] = maxSign[j];
+                var rs = mybase.Values.TakeWhile(
+                   x => x.sign.Equals(BitConverter.ToUInt64(sign, 0))
+                   && x.offsetStart <= offStart
+                   && x.offsetEnd >= offStart + (ulong)i);
+                if (rs.Count() > 0)
+                    foreach (var r in rs)
+                        res.Add(r.name);
 
-            return false;
+            }
+            return res;
         }
-        public void load()
+        public static void load()
         {
             {
                 if (File.Exists(path))
@@ -101,7 +115,7 @@ namespace ServiceConsole
                                 buf[j] = (byte)f.Read();
                             }
                             r.signLength = (BitConverter.ToUInt64(buf, 0));
-                            maxLength = r.signLength > maxLength ? r.signLength : maxLength;
+                            maxLength = (long)r.signLength > maxLength ? (long)r.signLength : maxLength;
 
                             //read offset start
                             len = f.Read();
@@ -111,7 +125,7 @@ namespace ServiceConsole
                                 buf[j] = (byte)f.Read();
                             }
                             r.offsetStart = BitConverter.ToUInt64(buf, 0);
-                            minOffStart = minOffStart > r.offsetStart ? r.offsetStart : minOffStart;
+                            minOffStart = minOffStart > (long)r.offsetStart ? (long)r.offsetStart : minOffStart;
 
                             //read offset end
                             len = f.Read();
@@ -121,10 +135,11 @@ namespace ServiceConsole
                                 buf[j] = (byte)f.Read();
                             }
                             r.offsetEnd = BitConverter.ToUInt64(buf, 0);
-                            maxOffEnd = maxOffEnd < r.offsetEnd ? r.offsetEnd : maxOffEnd;
+                            maxOffEnd = maxOffEnd < (long)r.offsetEnd ? (long)r.offsetEnd : maxOffEnd;
 
                             mybase.Add(r.hash, r);
                         }
+                        Console.WriteLine("base loaded...");
                     }
             }
         }

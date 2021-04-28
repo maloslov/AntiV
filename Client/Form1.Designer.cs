@@ -69,6 +69,12 @@ namespace Client
             this.textLog = new System.Windows.Forms.RichTextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.tabQarantine = new System.Windows.Forms.TabPage();
+            this.btnDelete = new System.Windows.Forms.Button();
+            this.btnRestore = new System.Windows.Forms.Button();
+            this.dataQarantine = new System.Windows.Forms.DataGridView();
+            this.QFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.QVirus = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabControl1.SuspendLayout();
             this.tabScan.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataScan)).BeginInit();
@@ -77,6 +83,8 @@ namespace Client
             this.tabPlan.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataPlan)).BeginInit();
             this.tableLayoutPanel1.SuspendLayout();
+            this.tabQarantine.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.dataQarantine)).BeginInit();
             this.SuspendLayout();
             // 
             // label1
@@ -196,6 +204,7 @@ namespace Client
             this.tabControl1.Controls.Add(this.tabScan);
             this.tabControl1.Controls.Add(this.tabMonitor);
             this.tabControl1.Controls.Add(this.tabPlan);
+            this.tabControl1.Controls.Add(this.tabQarantine);
             this.tabControl1.Location = new System.Drawing.Point(3, 3);
             this.tabControl1.Multiline = true;
             this.tabControl1.Name = "tabControl1";
@@ -211,9 +220,9 @@ namespace Client
             this.tabScan.Location = new System.Drawing.Point(23, 4);
             this.tabScan.Name = "tabScan";
             this.tabScan.Padding = new System.Windows.Forms.Padding(3);
-            this.tabScan.Size = new System.Drawing.Size(491, 232);
+            this.tabScan.Size = new System.Drawing.Size(491, 199);
             this.tabScan.TabIndex = 0;
-            this.tabScan.Text = "Scanning";
+            this.tabScan.Text = "Scan";
             this.tabScan.UseVisualStyleBackColor = true;
             // 
             // btnDelScan
@@ -277,9 +286,9 @@ namespace Client
             this.tabMonitor.Location = new System.Drawing.Point(23, 4);
             this.tabMonitor.Name = "tabMonitor";
             this.tabMonitor.Padding = new System.Windows.Forms.Padding(3);
-            this.tabMonitor.Size = new System.Drawing.Size(491, 232);
+            this.tabMonitor.Size = new System.Drawing.Size(491, 199);
             this.tabMonitor.TabIndex = 1;
-            this.tabMonitor.Text = "Monitoring";
+            this.tabMonitor.Text = "Monitor";
             this.tabMonitor.UseVisualStyleBackColor = true;
             // 
             // btnDelMonitor
@@ -342,7 +351,7 @@ namespace Client
             this.tabPlan.Padding = new System.Windows.Forms.Padding(3);
             this.tabPlan.Size = new System.Drawing.Size(491, 199);
             this.tabPlan.TabIndex = 2;
-            this.tabPlan.Text = "Planning";
+            this.tabPlan.Text = "Plan";
             this.tabPlan.UseVisualStyleBackColor = true;
             // 
             // btnDelPlan
@@ -530,6 +539,69 @@ namespace Client
             this.tableLayoutPanel1.Size = new System.Drawing.Size(524, 353);
             this.tableLayoutPanel1.TabIndex = 13;
             // 
+            // tabQarantine
+            // 
+            this.tabQarantine.Controls.Add(this.dataQarantine);
+            this.tabQarantine.Controls.Add(this.btnRestore);
+            this.tabQarantine.Controls.Add(this.btnDelete);
+            this.tabQarantine.Location = new System.Drawing.Point(23, 4);
+            this.tabQarantine.Name = "tabQarantine";
+            this.tabQarantine.Size = new System.Drawing.Size(491, 199);
+            this.tabQarantine.TabIndex = 3;
+            this.tabQarantine.Text = "Qarantine";
+            this.tabQarantine.UseVisualStyleBackColor = true;
+            // 
+            // btnDelete
+            // 
+            this.btnDelete.Location = new System.Drawing.Point(4, 4);
+            this.btnDelete.Name = "btnDelete";
+            this.btnDelete.Size = new System.Drawing.Size(225, 23);
+            this.btnDelete.TabIndex = 0;
+            this.btnDelete.Text = "delete file";
+            this.btnDelete.UseVisualStyleBackColor = true;
+            // 
+            // btnRestore
+            // 
+            this.btnRestore.Location = new System.Drawing.Point(235, 4);
+            this.btnRestore.Name = "btnRestore";
+            this.btnRestore.Size = new System.Drawing.Size(253, 23);
+            this.btnRestore.TabIndex = 1;
+            this.btnRestore.Text = "restore file";
+            this.btnRestore.UseVisualStyleBackColor = true;
+            // 
+            // dataQarantine
+            // 
+            this.dataQarantine.AllowUserToAddRows = false;
+            this.dataQarantine.AllowUserToDeleteRows = false;
+            this.dataQarantine.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dataQarantine.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
+            this.dataQarantine.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
+            this.QFile,
+            this.QVirus});
+            this.dataQarantine.Location = new System.Drawing.Point(4, 34);
+            this.dataQarantine.Name = "dataQarantine";
+            this.dataQarantine.ReadOnly = true;
+            this.dataQarantine.Size = new System.Drawing.Size(484, 162);
+            this.dataQarantine.TabIndex = 2;
+            // 
+            // QFile
+            // 
+            this.QFile.Frozen = true;
+            this.QFile.HeaderText = "Infected file";
+            this.QFile.Name = "QFile";
+            this.QFile.ReadOnly = true;
+            this.QFile.Width = 200;
+            // 
+            // QVirus
+            // 
+            this.QVirus.Frozen = true;
+            this.QVirus.HeaderText = "Found virus ";
+            this.QVirus.Name = "QVirus";
+            this.QVirus.ReadOnly = true;
+            this.QVirus.Width = 200;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -559,6 +631,8 @@ namespace Client
             ((System.ComponentModel.ISupportInitialize)(this.dataPlan)).EndInit();
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
+            this.tabQarantine.ResumeLayout(false);
+            ((System.ComponentModel.ISupportInitialize)(this.dataQarantine)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -605,6 +679,12 @@ namespace Client
         private System.Windows.Forms.Button btnAddScan;
         private System.Windows.Forms.Button btnDelMonitor;
         private System.Windows.Forms.Button btnDelPlan;
+        private System.Windows.Forms.TabPage tabQarantine;
+        private System.Windows.Forms.Button btnRestore;
+        private System.Windows.Forms.Button btnDelete;
+        private System.Windows.Forms.DataGridView dataQarantine;
+        private System.Windows.Forms.DataGridViewTextBoxColumn QFile;
+        private System.Windows.Forms.DataGridViewTextBoxColumn QVirus;
     }
 }
 

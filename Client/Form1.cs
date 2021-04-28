@@ -105,13 +105,13 @@ namespace Client
         private void btnScanStart_Click(object sender, EventArgs e)
         {
             lock (messageOut)
-                messageOut.Enqueue("\u0000\u0003");
+                messageOut.Enqueue("\u0000\u0002");
         }
 
         private void btnScanStop_Click(object sender, EventArgs e)
         {
             lock (messageOut)
-                messageOut.Enqueue("\u0000\u0004");
+                messageOut.Enqueue("\u0000\u0003");
         }
 
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
@@ -156,7 +156,7 @@ namespace Client
                     }
                     pipe.Write(buf, 0, buf.Length);
                 }
-                buf = new byte[128];
+                buf = new byte[256];
                 pipe.Read(buf, 0, buf.Length);
                 lock (messageIn)
                     messageIn.Enqueue(
@@ -178,16 +178,13 @@ namespace Client
                 case '\u0000':
                     break;
                 case '\u0001': //error
-                    textLog.AppendText(String.Format(
-                        "Error: {0}\n", str.Substring(2)));
+                    textLog.AppendText("Error: "+ str.Substring(2)+'\n');
                     break;
                 case '\u0002': //file scanning
-                    textLog.AppendText(String.Format(
-                        "Scanning file {0}\n", str.Substring(2)));
+                    textLog.AppendText("Scanned file "+ str.Substring(2)+'\n');
                     break;
                 case '\u0003': //monitored new file
-                    textLog.AppendText(String.Format(
-                        "New file in {0}\n", str.Substring(2)));
+                    textLog.AppendText("New file in "+str.Substring(2)+'\n');
                     break;
                 case '\u0004': //if scanning
                     btnScanStart.Enabled = true;
@@ -203,6 +200,11 @@ namespace Client
                     tPipe.Abort();
                     tPipe.Start();
                     textLog.AppendText("Disconnected\n");
+                    break;
+                case '\u0007': //infected file
+                    textLog.AppendText("Found a virus: " + str.Substring(2));
+                    var s = str.Substring(2).Split('|');
+                    dataQarantine.Rows.Add(s[0], s[1]);
                     break;
             }
         }

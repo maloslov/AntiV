@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.IO.Pipes;
 using System.Linq;
 using System.Security.AccessControl;
@@ -7,6 +8,7 @@ using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace ServiceConsole
 {
@@ -18,15 +20,16 @@ namespace ServiceConsole
         private static SHA256 sha256;
         private static Dictionary<byte[], string> header;
         private static List<Thread> threads;
-        private static List<string> monitoringDirs;
+        private static List<FileSystemWatcher> monitoringDirs;
         private static List<string[]> planningScan;
-        private static List<string> pending;
         private static Queue<string> messageIn;
-        private static Queue<string> messageOut;
+        public static Queue<string> messageOut;
+        private static Task scanner;
 
 
         protected static void Main(string[] args)
         {
+            ScanEngine.ScanEngineSetDefault();
             messageIn = new Queue<string>();
             messageOut = new Queue<string>();
             messageOut.Enqueue("\u0000\u0004");
@@ -35,10 +38,10 @@ namespace ServiceConsole
             mybase = new Base("c:\\antiv\\avdb.avb");
             threads = new List<Thread>();
             threads.Add(new Thread(ListenPipe));
-            threads.Add(new Thread(mybase.load));
+            threads.Add(new Thread(Base.load));
             threads.Add(new Thread(commandParse));
-            pending = new List<string>();
-            monitoringDirs = new List<string>();
+            scanner = new Task(ScanEngine.scan);
+            monitoringDirs = new List<FileSystemWatcher>();
             planningScan = new List<string[]>();
             timer1 = new System.Timers.Timer(20000);
             timer1.Elapsed += new System.Timers.ElapsedEventHandler(checkTime);
@@ -71,7 +74,7 @@ namespace ServiceConsole
                 byte[] buf;
                 while (!closing)
                 {
-                    buf = new byte[128];
+                    buf = new byte[256];
                     if (!pipe.IsConnected)
                     {
                         pipe.WaitForConnection();
@@ -88,10 +91,12 @@ namespace ServiceConsole
                     pipe.Read(buf, 0, buf.Length);
                     if (buf[1] != 0)
                         lock (messageIn)
+                        {
                             messageIn.Enqueue(
-                                Encoding.UTF8.GetString(buf, 0, buf.Length));
-                    //if (buf[1] == 1)
-                      //  return;
+                                   Encoding.UTF8.GetString(buf, 0, buf.Length));
+
+                            Console.WriteLine("encoding read...");
+                        }
                 }
                 buf = new byte[] { 0, 6 };
                 pipe.Write(buf, 0, buf.Length);
@@ -99,14 +104,17 @@ namespace ServiceConsole
             }
         }
 
-        static void commandParse()
+        private static void commandParse()
         {
             while (!closing)
             {
                 string str = "\u0000\u0000";
                 lock (messageIn)
                     if (messageIn.Count > 0)
+                    {
                         str = messageIn.Dequeue();
+                        Console.WriteLine("parsing...");
+                    }
                 switch (str[1])
                 {
                     case '\u0000':
@@ -123,24 +131,39 @@ namespace ServiceConsole
                     case '\u0002': //scan start
                         lock (messageOut)
                             messageOut.Enqueue("\u0000\u0004");
+                        ScanEngine.closing = 0;
+                        scanner.Start();
                         break;
                     case '\u0003': //scan stop
                         lock (messageOut)
                             messageOut.Enqueue("\u0000\u0005");
+                        ScanEngine.closing = 1;
                         break;
                     case '\u0004': //scan add
-                        if (!pending.Contains(str.Substring(2).Trim('\0')))
-                            pending.Add(str.Substring(2).Trim('\0'));
+                        lock (ScanEngine.toScan)
+                        {
+                            if (!ScanEngine.toScan.Contains(str.Substring(2).Trim('\0')))
+                                ScanEngine.toScan.Add(str.Substring(2).Trim('\0'));
+                        }
                         break;
                     case '\u0005': //scan remove
-                        pending.Remove(str.Substring(2).Trim('\0'));
+                        lock (ScanEngine.toScan)
+                            ScanEngine.toScan.Remove(str.Substring(2).Trim('\0'));
                         break;
                     case '\u0006': //monitor add
-                        if (!monitoringDirs.Contains(str.Substring(2).Trim('\0')))
-                            monitoringDirs.Add(str.Substring(2).Trim('\0'));
+                        using (var fsw = new FileSystemWatcher(str.Substring(2).Trim('\0')))
+                        {
+                            fsw.Created += new FileSystemEventHandler(newMonitor);
+                            if (!monitoringDirs.Contains(fsw))
+                                monitoringDirs.Add(fsw);
+                        }
                         break;
                     case '\u0007': //monitor remove
-                        monitoringDirs.Remove(str.Substring(2).Trim('\0'));
+                        using (var fsw = new FileSystemWatcher(str.Substring(2).Trim('\0')))
+                        {
+                            fsw.Created += new FileSystemEventHandler(newMonitor);
+                            monitoringDirs.Remove(fsw);
+                        }
                         break;
                     case '\u0008': //plan add
                         if (!planningScan.Contains(
@@ -161,8 +184,22 @@ namespace ServiceConsole
 
         }
 
+        private static void newMonitor(object sender,FileSystemEventArgs e)
+        {
+            lock (ScanEngine.toScan)
+                ScanEngine.toScan.Add(e.FullPath);
+        }
+
         static void checkTime(object sender, System.Timers.ElapsedEventArgs e)
         {
+            foreach (var p in planningScan)
+            {
+                if (DateTime.Compare(DateTime.Parse(p[1]), DateTime.Now) == 0)
+                {
+                    lock (ScanEngine.toScan)
+                        ScanEngine.toScan.Add(p[0]);
+                }
+            }
 
         }
     }
