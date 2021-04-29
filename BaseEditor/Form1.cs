@@ -29,12 +29,12 @@ namespace BaseEditor
                 return;
             }
             textCPath.Text = openFileDialog1.FileName;
-            using (var f = new StreamReader(openFileDialog1.FileName, Encoding.ASCII))
+            using (var f = File.Open(openFileDialog1.FileName, FileMode.Open,FileAccess.Read))
             {
                 textExe.Text = "";
-                while (!f.EndOfStream)
+                while (f.Position<f.Length)
                 {
-                    textExe.AppendText(Convert.ToString(f.Read())+'|');
+                    textExe.AppendText(Convert.ToString(f.ReadByte())+'|');
                 }
             }
         }

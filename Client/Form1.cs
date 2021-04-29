@@ -180,22 +180,22 @@ namespace Client
                 case '\u0000':
                     break;
                 case '\u0001': //error
-                    textLog.AppendText("Error: "+ str.Substring(2)+"\r\n");
+                    textLog.Text += ("Error: " + str.Substring(2) + "\r\n");
                     break;
                 case '\u0002': //file scanning
-                    textLog.AppendText("Scanned file "+ str.Substring(2)+"\r\n");
+                    textLog.Text += ("Scanned file "+ str.Substring(2)+"\r\n");
                     break;
                 case '\u0003': //monitored new file
                     textLog.AppendText("New file in "+str.Substring(2)+"\r\n");
                     break;
                 case '\u0004': //if scanning
-                    btnScanStart.Enabled = true;
-                    btnScanStop.Enabled = false;
+                    btnScanStart.Enabled = false;
+                    btnScanStop.Enabled = true;
                     textLog.AppendText("Scanner is working\r\n");
                     break;
                 case '\u0005': //if not scanning
-                    btnScanStart.Enabled = false;
-                    btnScanStop.Enabled = true;
+                    btnScanStart.Enabled = true;
+                    btnScanStop.Enabled = false;
                     textLog.AppendText("Scanner is stopped\r\n");
                     break;
                 case '\u0006': //disconnect
@@ -207,6 +207,11 @@ namespace Client
                     textLog.AppendText("Found a virus: " + str.Substring(2)+"\r\n");
                     var s = str.Substring(2).Split('|');
                     dataQarantine.Rows.Add(s[0], s[1]);
+                    break;
+                case '\u0008': //Connected
+                    textLog.AppendText("Connected.\r\n");
+                    btnScanStart.Enabled = true;
+                    btnScanStop.Enabled = false;
                     break;
             }
         }

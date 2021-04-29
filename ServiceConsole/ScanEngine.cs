@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using System.Threading;
+using System.IO.Compression;
 
 namespace ServiceConsole
 {
@@ -31,6 +32,7 @@ namespace ServiceConsole
             var path = "";
             while (closing == 0)
             {
+                //ZipArchive zip = ZipFile.Open(path, ZipArchiveMode.Read);   
                 if (toScan.Count == 0)
                     continue;
                 Console.WriteLine("scanning...");
@@ -65,19 +67,19 @@ namespace ServiceConsole
 
             Console.WriteLine("Scan file " + path);
             List<string> check = new List<string>();
-            var sr = File.OpenRead(path);
+            var sr = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
             {
                 byte[] head = new byte[4];
                 sr.Read(head, 0, head.Length);
                 if (!(head[0] == 77 && head[1] == 90    //exe file
                     || head[0] == 80 && head[1] == 75)) //zip file
                     return;
-
-                for (long i = Base.minOffStart; i < sr.Length - Base.maxLength; i++)
+                for(long i = Base.minOffStart;i<sr.Length-Base.maxLength;i++)
                 {
                     sr.Position = i;
                     byte[] buf = new byte[Base.maxLength];
-                    sr.Read(buf, 0, buf.Length);
+                    for(int j=0;j<buf.Length;j++)
+                        buf[j] = (byte)sr.ReadByte();
                     check = Base.isFound(buf, (ulong)i);
                     if (check.Count > 0)
                     {
@@ -86,34 +88,23 @@ namespace ServiceConsole
                         lock (Program.messageOut)
                             Program.messageOut.Enqueue("\u0000\u0007" 
                                 + path + '|' + check.First());
-                        sr = File.OpenWrite(path);
 
                         sr.Position = 0;
-                        sr.WriteByte((byte)(sr.ReadByte() + 50));
-                        sr.Position = 1;
-                        sr.WriteByte((byte)(sr.ReadByte() + 50));
-                        sr.Dispose();
+                        buf = new byte[2]; 
+                        sr.Read(buf,0,buf.Length);
+                        buf[0] += 25; buf[1] += 25;
+                        sr.Position = 0;
+                        sr.Write(buf, 0, buf.Length);
+                        sr.Close();
 
-                        File.Replace(path, "c:\\antiv\\quarantine\\" 
-                            + path.Substring(path.LastIndexOf('\\')),"");
+                        var destfile = "c:\\antiv\\quarantine\\"
+                            + path.Substring(path.LastIndexOf('\\'));
+                        File.Copy(path, destfile);
+                        File.Delete(path);
+                        return;
                     }
                 }
             }
-            /*
-            if (check.Count > 0)
-            {
-                using(var f = File.OpenWrite(path))
-                {
-                    f.Position = 0;
-                    f.WriteByte((byte)(f.ReadByte() + 50));
-                    f.Position = 1;
-                    f.WriteByte((byte)(f.ReadByte() + 50));
-                }
-                File.Replace(path, "c:\\antiv\\qarantine\\" 
-                    + path.Substring(path.LastIndexOf('\\')+1), "c:\\antiv\\qarantine\\"
-                    + path.Substring(path.LastIndexOf('\\')+1));
-                return;
-            }*/
             lock (scanned)
                 scanned.Add(path);
             lock (Program.messageOut)
@@ -136,6 +127,16 @@ namespace ServiceConsole
             foreach (var d in dirs)
                 lock (toScan)
                     toScan.Add(d);
+        }
+        private byte[] reArrange(byte[] origbuf, byte newbyte)
+        {
+            var res = origbuf;
+            for(int i=0; i < origbuf.Length-1; i++)
+            {
+                res[i] = res[i + 1];
+            }
+            res[res.Length - 1] = newbyte;
+            return res;
         }
     }
 }

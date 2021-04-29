@@ -32,7 +32,7 @@ namespace ServiceConsole
             ScanEngine.ScanEngineSetDefault();
             messageIn = new Queue<string>();
             messageOut = new Queue<string>();
-            messageOut.Enqueue("\u0000\u0004");
+            messageOut.Enqueue("\u0000\u0008\u0001");
             Console.WriteLine("Starting");
             closing = false;
             mybase = new Base("c:\\antiv\\avdb.avb");
@@ -87,7 +87,7 @@ namespace ServiceConsole
                         else buf = new byte[] { 0, 0 };
                     }
                     pipe.Write(buf, 0, buf.Length);
-                    buf = new byte[128];
+                    buf = new byte[256];
                     pipe.Read(buf, 0, buf.Length);
                     if (buf[1] != 0)
                         lock (messageIn)
