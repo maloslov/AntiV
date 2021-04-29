@@ -15,12 +15,12 @@ namespace ServiceConsole
         public static List<string> scanned;
         public static List<string> infected;
         public static List<string> toScan;
-        private static string curpath;
+        private static Queue<string> curpath;
 
         public static void ScanEngineSetDefault() { 
             tasks = new List<Task>(); 
             closing = 0;
-            curpath = "";
+            curpath = new Queue<string>();
             scanned = new List<string>();
             infected = new List<string>();
             toScan = new List<string>();
@@ -28,6 +28,7 @@ namespace ServiceConsole
         
         public static void scan()
         {
+            var path = "";
             while (closing == 0)
             {
                 if (toScan.Count == 0)
@@ -35,10 +36,10 @@ namespace ServiceConsole
                 Console.WriteLine("scanning...");
                 lock (curpath)
                 {
-                    curpath = toScan.First();
+                    curpath.Enqueue(path = toScan.First());
                     toScan.RemoveAt(0);
                 }
-                switch (File.Exists(curpath))
+                switch (File.Exists(path))
                 {
                     case true:
                         lock (tasks)
@@ -56,12 +57,15 @@ namespace ServiceConsole
         private static void scanFile()
         {
             string path;
+            if (curpath.Count == 0) { return; }
             lock (curpath)
-                path = curpath;
+            {
+                path = curpath.Dequeue();
+            }
 
-            Console.WriteLine("Scan file "+path);
+            Console.WriteLine("Scan file " + path);
             List<string> check = new List<string>();
-            using (var sr = File.OpenRead(path))
+            var sr = File.OpenRead(path);
             {
                 byte[] head = new byte[4];
                 sr.Read(head, 0, head.Length);
@@ -82,10 +86,20 @@ namespace ServiceConsole
                         lock (Program.messageOut)
                             Program.messageOut.Enqueue("\u0000\u0007" 
                                 + path + '|' + check.First());
-                        break;
+                        sr = File.OpenWrite(path);
+
+                        sr.Position = 0;
+                        sr.WriteByte((byte)(sr.ReadByte() + 50));
+                        sr.Position = 1;
+                        sr.WriteByte((byte)(sr.ReadByte() + 50));
+                        sr.Dispose();
+
+                        File.Replace(path, "c:\\antiv\\quarantine\\" 
+                            + path.Substring(path.LastIndexOf('\\')),"");
                     }
                 }
             }
+            /*
             if (check.Count > 0)
             {
                 using(var f = File.OpenWrite(path))
@@ -99,7 +113,7 @@ namespace ServiceConsole
                     + path.Substring(path.LastIndexOf('\\')+1), "c:\\antiv\\qarantine\\"
                     + path.Substring(path.LastIndexOf('\\')+1));
                 return;
-            }
+            }*/
             lock (scanned)
                 scanned.Add(path);
             lock (Program.messageOut)
@@ -109,8 +123,9 @@ namespace ServiceConsole
         private static void scanDir()
         {
             string path;
+            if (curpath.Count == 0) return;
             lock (curpath)
-                path = curpath;
+                path = curpath.Dequeue();
 
             Console.WriteLine("scan dir "+path);
             var files = Directory.GetFiles(path);

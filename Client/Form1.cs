@@ -24,6 +24,7 @@ namespace Client
         public Form1()
         {
             InitializeComponent();
+            timer1.Enabled = true;
             timer1.Start();
             closing = false; 
             messageOut = new Queue<string>();
@@ -144,10 +145,10 @@ namespace Client
                     }
                     buf = new byte[128];
                     pipe.Read(buf, 0, buf.Length);
-
-                    lock (messageIn)
-                        messageIn.Enqueue(
-                            Encoding.UTF8.GetString(buf, 0, buf.Length));
+                    if (buf[1] != 0)
+                        lock (messageIn)
+                            messageIn.Enqueue(
+                                Encoding.UTF8.GetString(buf, 0, buf.Length));
                     lock (messageOut)
                     {
                         if (messageOut.Count > 0)
@@ -170,39 +171,40 @@ namespace Client
         private void commandParse()
         {
             string str = "\u0000\u0000";
-            lock (messageIn)
-                if (messageIn.Count > 0)
+            if (messageIn.Count > 0)
+                lock (messageIn)
                     str = messageIn.Dequeue();
+            else return;
             switch (str[1])
             {
                 case '\u0000':
                     break;
                 case '\u0001': //error
-                    textLog.AppendText("Error: "+ str.Substring(2)+'\n');
+                    textLog.AppendText("Error: "+ str.Substring(2)+"\r\n");
                     break;
                 case '\u0002': //file scanning
-                    textLog.AppendText("Scanned file "+ str.Substring(2)+'\n');
+                    textLog.AppendText("Scanned file "+ str.Substring(2)+"\r\n");
                     break;
                 case '\u0003': //monitored new file
-                    textLog.AppendText("New file in "+str.Substring(2)+'\n');
+                    textLog.AppendText("New file in "+str.Substring(2)+"\r\n");
                     break;
                 case '\u0004': //if scanning
                     btnScanStart.Enabled = true;
                     btnScanStop.Enabled = false;
-                    textLog.AppendText("Scanner is working\n");
+                    textLog.AppendText("Scanner is working\r\n");
                     break;
                 case '\u0005': //if not scanning
                     btnScanStart.Enabled = false;
                     btnScanStop.Enabled = true;
-                    textLog.AppendText("Scanner is stopped\n");
+                    textLog.AppendText("Scanner is stopped\r\n");
                     break;
                 case '\u0006': //disconnect
                     tPipe.Abort();
                     tPipe.Start();
-                    textLog.AppendText("Disconnected\n");
+                    textLog.AppendText("Disconnected\r\n");
                     break;
                 case '\u0007': //infected file
-                    textLog.AppendText("Found a virus: " + str.Substring(2));
+                    textLog.AppendText("Found a virus: " + str.Substring(2)+"\r\n");
                     var s = str.Substring(2).Split('|');
                     dataQarantine.Rows.Add(s[0], s[1]);
                     break;
