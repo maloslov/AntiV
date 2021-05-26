@@ -14,6 +14,9 @@ namespace Client
         [STAThread]
         static void Main()
         {
+            var p = System.Diagnostics.Process.GetProcessesByName("AVClient");
+            if (p.Length > 1)
+                return;
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
             Application.Run(new Form1());

@@ -7,35 +7,34 @@ using System.IO;
 using System.Threading;
 using System.IO.Compression;
 
-namespace ServiceConsole
+namespace Service
 {
     class ScanEngine
     {
         public static List<Task> tasks;
         public static byte closing;
         public static List<string> scanned;
-        public static Dictionary<string,string> infected;
+        public static Dictionary<string, string> infected;
         public static List<string> toScan;
         private static Queue<string> curpath;
 
-        public static void ScanEngineSetDefault() { 
-            tasks = new List<Task>(); 
+        public static void ScanEngineSetDefault()
+        {
+            tasks = new List<Task>();
             closing = 0;
             curpath = new Queue<string>();
             scanned = new List<string>();
-            infected = new Dictionary<string,string>();
+            infected = new Dictionary<string, string>();
             toScan = new List<string>();
         }
-        
+
         public static void scan()
         {
             var path = "";
             while (closing == 0)
-            {
-                //ZipArchive zip = ZipFile.Open(path, ZipArchiveMode.Read);   
+            {  
                 if (toScan.Count == 0)
                     continue;
-                Console.WriteLine("scanning...");
                 lock (curpath)
                 {
                     curpath.Enqueue(path = toScan.First());
@@ -58,14 +57,13 @@ namespace ServiceConsole
         }
         private static void scanFile()
         {
-            string path,type="";
+            string path, type = "";
             if (curpath.Count == 0) { return; }
             lock (curpath)
             {
                 path = curpath.Dequeue();
             }
 
-            Console.WriteLine("Scan file " + path);
             List<string> check = new List<string>();
             var sr = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
             {
@@ -77,21 +75,21 @@ namespace ServiceConsole
                     type = "zip";
                 else
                     return;
-                for(long i = Base.minOffStart;i<sr.Length-Base.maxLength;i++)
+                for (long i = Base.minOffStart; i < sr.Length - Base.maxLength; i++)
                 {
                     if (closing == 1)
                         return;
                     sr.Position = i;
                     byte[] buf = new byte[Base.maxLength];
-                    for(int j=0;j<buf.Length;j++)
+                    for (int j = 0; j < buf.Length; j++)
                         buf[j] = (byte)sr.ReadByte();
                     check = Base.isFound(buf, (ulong)i, type);
                     if (check.Count > 0)
                     {
 
                         sr.Position = 0;
-                        buf = new byte[2]; 
-                        sr.Read(buf,0,buf.Length);
+                        buf = new byte[2];
+                        sr.Read(buf, 0, buf.Length);
                         buf[0] += 25; buf[1] += 25;
                         sr.Position = 0;
                         sr.Write(buf, 0, buf.Length);
@@ -110,8 +108,8 @@ namespace ServiceConsole
                         File.Delete(path);
                         lock (infected)
                             infected.Add(destfile, path);
-                        lock (Program.messageOut)
-                            Program.messageOut.Enqueue("\u0000\u0007"
+                        lock (Service1.messageOut)
+                            Service1.messageOut.Enqueue("\u0000\u0007"
                                 + path + '|' + check.First() + '|' + destfile);
                         return;
                     }
@@ -119,8 +117,8 @@ namespace ServiceConsole
             }
             lock (scanned)
                 scanned.Add(path);
-            lock (Program.messageOut)
-                Program.messageOut.Enqueue("\u0000\u0002" + path);
+            lock (Service1.messageOut)
+                Service1.messageOut.Enqueue("\u0000\u0002" + path);
 
         }
         private static void scanDir()
@@ -130,7 +128,7 @@ namespace ServiceConsole
             lock (curpath)
                 path = curpath.Dequeue();
 
-            Console.WriteLine("scan dir "+path);
+            Console.WriteLine("scan dir " + path);
             var files = Directory.GetFiles(path);
             var dirs = Directory.GetDirectories(path);
             foreach (var f in files)
@@ -139,16 +137,6 @@ namespace ServiceConsole
             foreach (var d in dirs)
                 lock (toScan)
                     toScan.Add(d);
-        }
-        private byte[] reArrange(byte[] origbuf, byte newbyte)
-        {
-            var res = origbuf;
-            for(int i=0; i < origbuf.Length-1; i++)
-            {
-                res[i] = res[i + 1];
-            }
-            res[res.Length - 1] = newbyte;
-            return res;
         }
     }
 }

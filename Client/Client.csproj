@@ -7,7 +7,7 @@
     <ProjectGuid>{3A871F0D-FF70-4D41-B6C7-15C974991F51}</ProjectGuid>
     <OutputType>WinExe</OutputType>
     <RootNamespace>Client</RootNamespace>
-    <AssemblyName>Client</AssemblyName>
+    <AssemblyName>AVClient</AssemblyName>
     <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>

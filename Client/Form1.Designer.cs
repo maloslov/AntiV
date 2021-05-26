@@ -68,13 +68,14 @@ namespace Client
             this.btnAddPlan = new System.Windows.Forms.Button();
             this.tabQarantine = new System.Windows.Forms.TabPage();
             this.dataQarantine = new System.Windows.Forms.DataGridView();
-            this.QFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.QVirus = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnRestore = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.textLog = new System.Windows.Forms.RichTextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
+            this.QFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Found = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.QVirus = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabControl1.SuspendLayout();
             this.tabScan.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataScan)).BeginInit();
@@ -521,28 +522,13 @@ namespace Client
             this.dataQarantine.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
             this.dataQarantine.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
             this.QFile,
+            this.Found,
             this.QVirus});
             this.dataQarantine.Location = new System.Drawing.Point(4, 34);
             this.dataQarantine.Name = "dataQarantine";
             this.dataQarantine.ReadOnly = true;
             this.dataQarantine.Size = new System.Drawing.Size(484, 162);
             this.dataQarantine.TabIndex = 2;
-            // 
-            // QFile
-            // 
-            this.QFile.Frozen = true;
-            this.QFile.HeaderText = "Infected file";
-            this.QFile.Name = "QFile";
-            this.QFile.ReadOnly = true;
-            this.QFile.Width = 200;
-            // 
-            // QVirus
-            // 
-            this.QVirus.Frozen = true;
-            this.QVirus.HeaderText = "Found virus ";
-            this.QVirus.Name = "QVirus";
-            this.QVirus.ReadOnly = true;
-            this.QVirus.Width = 200;
             // 
             // btnRestore
             // 
@@ -602,6 +588,29 @@ namespace Client
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 35F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(524, 353);
             this.tableLayoutPanel1.TabIndex = 13;
+            // 
+            // QFile
+            // 
+            this.QFile.Frozen = true;
+            this.QFile.HeaderText = "Infected file";
+            this.QFile.Name = "QFile";
+            this.QFile.ReadOnly = true;
+            this.QFile.Width = 200;
+            // 
+            // Found
+            // 
+            this.Found.Frozen = true;
+            this.Found.HeaderText = "Was found in";
+            this.Found.Name = "Found";
+            this.Found.ReadOnly = true;
+            // 
+            // QVirus
+            // 
+            this.QVirus.Frozen = true;
+            this.QVirus.HeaderText = "Found virus ";
+            this.QVirus.Name = "QVirus";
+            this.QVirus.ReadOnly = true;
+            this.QVirus.Width = 200;
             // 
             // Form1
             // 
@@ -685,6 +694,7 @@ namespace Client
         private System.Windows.Forms.Button btnDelete;
         private System.Windows.Forms.DataGridView dataQarantine;
         private System.Windows.Forms.DataGridViewTextBoxColumn QFile;
+        private System.Windows.Forms.DataGridViewTextBoxColumn Found;
         private System.Windows.Forms.DataGridViewTextBoxColumn QVirus;
     }
 }

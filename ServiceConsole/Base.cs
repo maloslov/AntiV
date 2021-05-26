@@ -36,7 +36,7 @@ namespace ServiceConsole
             maxLength = 8;
             
         }
-        public static List<string> isFound(byte[] maxSign, ulong offStart)
+        public static List<string> isFound(byte[] maxSign, ulong offStart, string type)
         {
             var sha = SHA256.Create();
             var res = new List<string>();
@@ -48,7 +48,8 @@ namespace ServiceConsole
                 var key = BitConverter.ToUInt64(sha.ComputeHash(sign), 0);
                 if(mybase.ContainsKey(key))
                 {
-                    res.Add(mybase[key].name);
+                    if (mybase[key].ext.Equals(type))
+                        res.Add(mybase[key].name);
                 }
                 /*
                 ulong k;

@@ -49,12 +49,6 @@ namespace ServiceConsole
                 t.Start();
         }
 
-        protected static void OnStop()
-        {
-            closing = true;
-            while (threads[0].IsAlive) { }
-
-        }
 
         private static void ListenPipe()
         {

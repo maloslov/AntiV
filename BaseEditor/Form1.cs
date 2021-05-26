@@ -102,12 +102,12 @@ namespace BaseEditor
                 openFileDialog1.Filter = "AVBase file|*.avb";
                 if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
                     return;
-                using (var f = new StreamReader(openFileDialog1.FileName, Encoding.ASCII))
+                using (var f = File.Open(openFileDialog1.FileName, FileMode.Open,FileAccess.Read))
                 {
                     byte[] buf = new byte[9];
                     for(int j = 0; j < buf.Length; j++)
                     {
-                        buf[j] = (byte)f.Read();
+                        buf[j] = (byte)f.ReadByte();
                     }
                     if (!(buf[0] == 'b' && buf[1] == 'a' && buf[2] == 's'
                         && buf[3] == 'o' && buf[4] == 'v'))
@@ -117,78 +117,77 @@ namespace BaseEditor
                     {
                         dataGridView1.Rows.Add();
                         //read name
-                        int len = f.Read();
+                        int len = f.ReadByte();
                         buf = new byte[len];
                         for(int j = 0; j < len; j++)
                         {
-                            buf[j] = (byte)f.Read();
+                            buf[j] = (byte)f.ReadByte();
                         }
                         dataGridView1.Rows[i].Cells[0].Value 
                             = Encoding.ASCII.GetString(buf);
 
                         //read file type
-                        len = f.Read();
+                        len = f.ReadByte();
                         buf = new byte[len];
                         for (int j = 0; j < len; j++)
                         {
-                            buf[j] = (byte)f.Read();
+                            buf[j] = (byte)f.ReadByte();
                         }
                         dataGridView1.Rows[i].Cells[1].Value
                             = Encoding.ASCII.GetString(buf);
 
                         //read prefix
-                        len = f.Read();
+                        len = f.ReadByte();
                         var str = "";
                         for(int j = 0; j < len; j++)
                         {
-                            str += Convert.ToString(f.Read())+'|';
+                            str += Convert.ToString(f.ReadByte())+'|';
                         }
                         dataGridView1.Rows[i].Cells[2].Value 
                             = str.Substring(0,str.Length-1);
                         
                         //read hash
-                        len = f.Read();
+                        len = f.ReadByte();
                         buf = new byte[len];
                         for(int j = 0; j < len; j++)
                         {
-                            buf[j] =(byte) f.Read();
+                            buf[j] =(byte) f.ReadByte();
                         }
                         dataGridView1.Rows[i].Cells[3].Value 
                             = (BitConverter.ToUInt64(buf,0));
 
                         //read length
-                        len = f.Read();
+                        len = f.ReadByte();
                         buf = new byte[len];
                         for(int j = 0; j < len; j++)
                         {
-                            buf[j] = (byte)f.Read();
+                            buf[j] = (byte)f.ReadByte();
                         }
                         dataGridView1.Rows[i].Cells[4].Value 
                             = (BitConverter.ToUInt64(buf,0));
 
                         //read offset start
-                        len = f.Read();
+                        len = f.ReadByte();
                         buf = new byte[len];
                         for(int j = 0; j < len; j++)
                         {
-                            buf[j] = (byte)f.Read();
+                            buf[j] = (byte)f.ReadByte();
                         }
                         dataGridView1.Rows[i].Cells[5].Value 
                             = BitConverter.ToUInt64(buf,0);
 
                         //read offset end
-                        len = f.Read();
+                        len = f.ReadByte();
                         buf = new byte[len];
                         for (int j = 0; j < len; j++)
                         {
-                            buf[j] = (byte)f.Read();
+                            buf[j] = (byte)f.ReadByte();
                         }
                         dataGridView1.Rows[i].Cells[6].Value 
                             = BitConverter.ToUInt64(buf, 0);
                     }
                 }
             }
-            //catch (Exception ex) { MessageBox.Show(ex.StackTrace); }
         }
 
         private void saveBase_Click(object sender, EventArgs e)

@@ -206,7 +206,7 @@ namespace Client
                 case '\u0007': //infected file
                     textLog.AppendText("Found a virus: " + str.Substring(2)+"\r\n");
                     var s = str.Substring(2).Split('|');
-                    dataQarantine.Rows.Add(s[0], s[1]);
+                    dataQarantine.Rows.Add(s[0], s[2], s[1]);
                     break;
                 case '\u0008': //Connected
                     textLog.AppendText("Connected.\r\n");
