@@ -73,8 +73,9 @@ namespace Service
             scanner = new Task(ScanEngine.scan);
             monitoringDirs = new List<FileSystemWatcher>();
             planningScan = new List<string[]>();
-            timer1 = new System.Timers.Timer(20000);
+            timer1 = new System.Timers.Timer(1000);
             timer1.Elapsed += new System.Timers.ElapsedEventHandler(checkTime);
+            timer1.Start();
             foreach (var t in threads)
                 t.Start();
         }
@@ -222,7 +223,7 @@ namespace Service
         {
             foreach (var p in planningScan)
             {
-                if (DateTime.Compare(DateTime.Parse(p[1]), DateTime.Now) == 0)
+                if (DateTime.Compare(DateTime.Parse(p[1]), DateTime.Now) <= 0)
                 {
                     lock (ScanEngine.toScan)
                         ScanEngine.toScan.Add(p[0]);

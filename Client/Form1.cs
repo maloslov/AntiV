@@ -66,7 +66,14 @@ namespace Client
                 p.StartInfo = new ProcessStartInfo(
                         "c:\\Antiv\\servicecontrol.exe", 
                         "start");
-                p.Start();
+                try
+                {
+                    p.Start();
+                }
+                catch(Exception ex)
+                {
+                    textLog.AppendText(ex.Message);
+                }
             }
         }
 
@@ -74,10 +81,7 @@ namespace Client
         {
             using (var p = new Process())
             {
-                p.StartInfo = new ProcessStartInfo(
-                        //"c:\\Antiv\\servicecontrol.exe","stop"
-                    "c:\\antiv\\serviceconsole.exe"    
-                    );
+                p.StartInfo = new ProcessStartInfo("c:\\Antiv\\servicecontrol.exe","stop");
                 try
                 {
                     p.Start();
@@ -118,7 +122,7 @@ namespace Client
         private void Form1_FormClosing(object sender, FormClosingEventArgs e)
         {
             closing = true;
-            while (tPipe.IsAlive) { }
+            if (tPipe.IsAlive) tPipe.Abort();
         }
 
         private void timer1_Tick(object sender, EventArgs e)
@@ -180,13 +184,13 @@ namespace Client
                 case '\u0000':
                     break;
                 case '\u0001': //error
-                    textLog.Text += ("Error: " + str.Substring(2) + "\r\n");
+                    textLog.Text += ($"Error: {str.Substring(2)}\r\n");
                     break;
                 case '\u0002': //file scanning
-                    textLog.Text += ("Scanned file "+ str.Substring(2)+"\r\n");
+                    textLog.Text += ($"Scanned file {str.Substring(2)} is safe\r\n");
                     break;
                 case '\u0003': //monitored new file
-                    textLog.AppendText("New file in "+str.Substring(2)+"\r\n");
+                    textLog.AppendText($"New file in {str.Substring(2)}\r\n");
                     break;
                 case '\u0004': //if scanning
                     btnScanStart.Enabled = false;
@@ -204,9 +208,9 @@ namespace Client
                     textLog.AppendText("Disconnected\r\n");
                     break;
                 case '\u0007': //infected file
-                    textLog.AppendText("Found a virus: " + str.Substring(2)+"\r\n");
                     var s = str.Substring(2).Split('|');
-                    dataQarantine.Rows.Add(s[0], s[2], s[1]);
+                    textLog.AppendText($"Found a virus: {s[1]} in {s[0]} \r\n");
+                    dataQarantine.Rows.Add(s[2], s[0], s[1]);
                     break;
                 case '\u0008': //Connected
                     textLog.AppendText("Connected.\r\n");
@@ -285,10 +289,9 @@ namespace Client
         {
             if (textPath.Text.Length > 0)
             {
-                var time = String.Format("{0}:{1}{2}"
-                    , comboHour.Text
-                    , comboMinute1.Text
-                    , comboMinute2.Text);
+                if (dateTimePicker1.Value <= DateTime.Now)
+                    return;
+                var time = dateTimePicker1.Value.ToString();
                 foreach (DataGridViewRow r in dataPlan.Rows)
                 {
                     if (r.Cells[0].Value.Equals(textPath.Text)
@@ -317,10 +320,5 @@ namespace Client
             }
         }
         #endregion
-
-        private void comboHour_KeyPress(object sender, KeyPressEventArgs e)
-        {
-            e.Handled = true;
-        }
     }
 }

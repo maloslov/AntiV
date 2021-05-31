@@ -50,6 +50,13 @@ namespace BaseEditor
             this.saveBase = new System.Windows.Forms.Button();
             this.openBase = new System.Windows.Forms.Button();
             this.dataGridView1 = new System.Windows.Forms.DataGridView();
+            this.MalName = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.FileType = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Prefix = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Hash = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Length = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.OStart = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.OEnd = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabPage1 = new System.Windows.Forms.TabPage();
             this.btnParse = new System.Windows.Forms.Button();
             this.textExe = new System.Windows.Forms.RichTextBox();
@@ -66,13 +73,6 @@ namespace BaseEditor
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.backgroundWorker1 = new System.ComponentModel.BackgroundWorker();
             this.timer1 = new System.Windows.Forms.Timer(this.components);
-            this.MalName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.FileType = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Prefix = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Hash = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Length = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.OStart = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.OEnd = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.tabControl1.SuspendLayout();
             this.tabPage2.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
@@ -283,6 +283,48 @@ namespace BaseEditor
             this.dataGridView1.Size = new System.Drawing.Size(407, 286);
             this.dataGridView1.TabIndex = 0;
             // 
+            // MalName
+            // 
+            this.MalName.HeaderText = "Malware name";
+            this.MalName.Name = "MalName";
+            this.MalName.Width = 60;
+            // 
+            // FileType
+            // 
+            this.FileType.HeaderText = "File type";
+            this.FileType.Name = "FileType";
+            this.FileType.Width = 30;
+            // 
+            // Prefix
+            // 
+            this.Prefix.HeaderText = "Signature prefix";
+            this.Prefix.Name = "Prefix";
+            this.Prefix.Width = 60;
+            // 
+            // Hash
+            // 
+            this.Hash.HeaderText = "SHA-256 without prefix";
+            this.Hash.Name = "Hash";
+            this.Hash.Width = 60;
+            // 
+            // Length
+            // 
+            this.Length.HeaderText = "Signature length";
+            this.Length.Name = "Length";
+            this.Length.Width = 60;
+            // 
+            // OStart
+            // 
+            this.OStart.HeaderText = "Offset start";
+            this.OStart.Name = "OStart";
+            this.OStart.Width = 50;
+            // 
+            // OEnd
+            // 
+            this.OEnd.HeaderText = "Offset end";
+            this.OEnd.Name = "OEnd";
+            this.OEnd.Width = 50;
+            // 
             // tabPage1
             // 
             this.tabPage1.Controls.Add(this.btnParse);
@@ -410,47 +452,9 @@ namespace BaseEditor
             // 
             this.openFileDialog1.FileName = "openFileDialog1";
             // 
-            // MalName
+            // timer1
             // 
-            this.MalName.HeaderText = "Malware name";
-            this.MalName.Name = "MalName";
-            this.MalName.Width = 60;
-            // 
-            // FileType
-            // 
-            this.FileType.HeaderText = "File type";
-            this.FileType.Name = "FileType";
-            this.FileType.Width = 30;
-            // 
-            // Prefix
-            // 
-            this.Prefix.HeaderText = "Signature prefix";
-            this.Prefix.Name = "Prefix";
-            this.Prefix.Width = 60;
-            // 
-            // Hash
-            // 
-            this.Hash.HeaderText = "SHA-256 without prefix";
-            this.Hash.Name = "Hash";
-            this.Hash.Width = 60;
-            // 
-            // Length
-            // 
-            this.Length.HeaderText = "Signature length";
-            this.Length.Name = "Length";
-            this.Length.Width = 60;
-            // 
-            // OStart
-            // 
-            this.OStart.HeaderText = "Offset start";
-            this.OStart.Name = "OStart";
-            this.OStart.Width = 50;
-            // 
-            // OEnd
-            // 
-            this.OEnd.HeaderText = "Offset end";
-            this.OEnd.Name = "OEnd";
-            this.OEnd.Width = 50;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
             // 
             // Form1
             // 

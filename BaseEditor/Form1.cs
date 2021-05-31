@@ -15,9 +15,14 @@ namespace BaseEditor
 {
     public partial class Form1 : Form
     {
-        public Form1()
+        private string buf = "";
+        public Form1(string[] args)
         {
             InitializeComponent();
+            timer1.Interval = 100;
+            timer1.Start();
+            if (args.Length > 0)
+                openfromfile(args[0]);
         }
 
         #region tab2
@@ -29,14 +34,18 @@ namespace BaseEditor
                 return;
             }
             textCPath.Text = openFileDialog1.FileName;
-            using (var f = File.Open(openFileDialog1.FileName, FileMode.Open,FileAccess.Read))
+            textExe.Text = "";
+            Task load = Task.Run(() =>
             {
-                textExe.Text = "";
-                while (f.Position<f.Length)
+                using (var f = File.Open(openFileDialog1.FileName, FileMode.Open, FileAccess.Read))
                 {
-                    textExe.AppendText(Convert.ToString(f.ReadByte())+'|');
+                    while (f.Position<f.Length)
+                    {
+                        lock (buf)
+                            buf += (Convert.ToString(f.ReadByte()) + '|');
+                    }
                 }
-            }
+            });
         }
 
         private void textExe_SelectionChanged(object sender, EventArgs e)
@@ -102,91 +111,7 @@ namespace BaseEditor
                 openFileDialog1.Filter = "AVBase file|*.avb";
                 if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
                     return;
-                using (var f = File.Open(openFileDialog1.FileName, FileMode.Open,FileAccess.Read))
-                {
-                    byte[] buf = new byte[9];
-                    for(int j = 0; j < buf.Length; j++)
-                    {
-                        buf[j] = (byte)f.ReadByte();
-                    }
-                    if (!(buf[0] == 'b' && buf[1] == 'a' && buf[2] == 's'
-                        && buf[3] == 'o' && buf[4] == 'v'))
-                        return;
-                    int rows = BitConverter.ToInt32(buf,5);
-                    for (int i = 0; i < rows; i++)
-                    {
-                        dataGridView1.Rows.Add();
-                        //read name
-                        int len = f.ReadByte();
-                        buf = new byte[len];
-                        for(int j = 0; j < len; j++)
-                        {
-                            buf[j] = (byte)f.ReadByte();
-                        }
-                        dataGridView1.Rows[i].Cells[0].Value 
-                            = Encoding.ASCII.GetString(buf);
-
-                        //read file type
-                        len = f.ReadByte();
-                        buf = new byte[len];
-                        for (int j = 0; j < len; j++)
-                        {
-                            buf[j] = (byte)f.ReadByte();
-                        }
-                        dataGridView1.Rows[i].Cells[1].Value
-                            = Encoding.ASCII.GetString(buf);
-
-                        //read prefix
-                        len = f.ReadByte();
-                        var str = "";
-                        for(int j = 0; j < len; j++)
-                        {
-                            str += Convert.ToString(f.ReadByte())+'|';
-                        }
-                        dataGridView1.Rows[i].Cells[2].Value 
-                            = str.Substring(0,str.Length-1);
-                        
-                        //read hash
-                        len = f.ReadByte();
-                        buf = new byte[len];
-                        for(int j = 0; j < len; j++)
-                        {
-                            buf[j] =(byte) f.ReadByte();
-                        }
-                        dataGridView1.Rows[i].Cells[3].Value 
-                            = (BitConverter.ToUInt64(buf,0));
-
-                        //read length
-                        len = f.ReadByte();
-                        buf = new byte[len];
-                        for(int j = 0; j < len; j++)
-                        {
-                            buf[j] = (byte)f.ReadByte();
-                        }
-                        dataGridView1.Rows[i].Cells[4].Value 
-                            = (BitConverter.ToUInt64(buf,0));
-
-                        //read offset start
-                        len = f.ReadByte();
-                        buf = new byte[len];
-                        for(int j = 0; j < len; j++)
-                        {
-                            buf[j] = (byte)f.ReadByte();
-                        }
-                        dataGridView1.Rows[i].Cells[5].Value 
-                            = BitConverter.ToUInt64(buf,0);
-
-                        //read offset end
-                        len = f.ReadByte();
-                        buf = new byte[len];
-                        for (int j = 0; j < len; j++)
-                        {
-                            buf[j] = (byte)f.ReadByte();
-                        }
-                        dataGridView1.Rows[i].Cells[6].Value 
-                            = BitConverter.ToUInt64(buf, 0);
-                    }
-                }
+                openfromfile(openFileDialog1.FileName);
             }
         }
 
@@ -275,5 +200,110 @@ namespace BaseEditor
         }
 
         #endregion
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if(buf.Length > 0)
+                lock (buf)
+                {
+                    textExe.AppendText(buf);
+                    buf = "";
+                }
+        }
+        private void openfromfile(string file)
+        {
+            try
+            {
+                using (var f = File.Open(file, FileMode.Open, FileAccess.Read))
+                {
+                    byte[] buf = new byte[9];
+                    for (int j = 0; j < buf.Length; j++)
+                    {
+                        buf[j] = (byte)f.ReadByte();
+                    }
+                    if (!(buf[0] == 'b' && buf[1] == 'a' && buf[2] == 's'
+                        && buf[3] == 'o' && buf[4] == 'v'))
+                        return;
+                    int rows = BitConverter.ToInt32(buf, 5);
+                    for (int i = 0; i < rows; i++)
+                    {
+                        dataGridView1.Rows.Add();
+                        //read name
+                        int len = f.ReadByte();
+                        buf = new byte[len];
+                        for (int j = 0; j < len; j++)
+                        {
+                            buf[j] = (byte)f.ReadByte();
+                        }
+                        dataGridView1.Rows[i].Cells[0].Value
+                            = Encoding.ASCII.GetString(buf);
+
+                        //read file type
+                        len = f.ReadByte();
+                        buf = new byte[len];
+                        for (int j = 0; j < len; j++)
+                        {
+                            buf[j] = (byte)f.ReadByte();
+                        }
+                        dataGridView1.Rows[i].Cells[1].Value
+                            = Encoding.ASCII.GetString(buf);
+
+                        //read prefix
+                        len = f.ReadByte();
+                        var str = "";
+                        for (int j = 0; j < len; j++)
+                        {
+                            str += Convert.ToString(f.ReadByte()) + '|';
+                        }
+                        dataGridView1.Rows[i].Cells[2].Value
+                            = str.Substring(0, str.Length - 1);
+
+                        //read hash
+                        len = f.ReadByte();
+                        buf = new byte[len];
+                        for (int j = 0; j < len; j++)
+                        {
+                            buf[j] = (byte)f.ReadByte();
+                        }
+                        dataGridView1.Rows[i].Cells[3].Value
+                            = (BitConverter.ToUInt64(buf, 0));
+
+                        //read length
+                        len = f.ReadByte();
+                        buf = new byte[len];
+                        for (int j = 0; j < len; j++)
+                        {
+                            buf[j] = (byte)f.ReadByte();
+                        }
+                        dataGridView1.Rows[i].Cells[4].Value
+                            = (BitConverter.ToUInt64(buf, 0));
+
+                        //read offset start
+                        len = f.ReadByte();
+                        buf = new byte[len];
+                        for (int j = 0; j < len; j++)
+                        {
+                            buf[j] = (byte)f.ReadByte();
+                        }
+                        dataGridView1.Rows[i].Cells[5].Value
+                            = BitConverter.ToUInt64(buf, 0);
+
+                        //read offset end
+                        len = f.ReadByte();
+                        buf = new byte[len];
+                        for (int j = 0; j < len; j++)
+                        {
+                            buf[j] = (byte)f.ReadByte();
+                        }
+                        dataGridView1.Rows[i].Cells[6].Value
+                            = BitConverter.ToUInt64(buf, 0);
+                    }
+                }
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show(ex.Message);
+            }
+        }
     }
 }

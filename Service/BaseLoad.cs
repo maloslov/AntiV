@@ -48,7 +48,7 @@ namespace Service
                 var key = BitConverter.ToUInt64(sha.ComputeHash(sign), 0);
                 if (mybase.ContainsKey(key))
                 {
-                    if (mybase[key].ext.Equals(type))
+                    if (mybase[key].ext.Trim('.').Equals(type.Trim('.')))
                         res.Add(mybase[key].name);
                 }
             }

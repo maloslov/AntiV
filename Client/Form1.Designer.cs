@@ -60,22 +60,19 @@ namespace Client
             this.dataPlan = new System.Windows.Forms.DataGridView();
             this.path = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.time = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.label5 = new System.Windows.Forms.Label();
-            this.comboMinute1 = new System.Windows.Forms.ComboBox();
-            this.comboMinute2 = new System.Windows.Forms.ComboBox();
-            this.comboHour = new System.Windows.Forms.ComboBox();
             this.label4 = new System.Windows.Forms.Label();
             this.btnAddPlan = new System.Windows.Forms.Button();
             this.tabQarantine = new System.Windows.Forms.TabPage();
             this.dataQarantine = new System.Windows.Forms.DataGridView();
+            this.QFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.Found = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.QVirus = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnRestore = new System.Windows.Forms.Button();
             this.btnDelete = new System.Windows.Forms.Button();
             this.textLog = new System.Windows.Forms.RichTextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.QFile = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.Found = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.QVirus = new System.Windows.Forms.DataGridViewTextBoxColumn();
+            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             this.tabControl1.SuspendLayout();
             this.tabScan.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataScan)).BeginInit();
@@ -340,12 +337,9 @@ namespace Client
             // 
             // tabPlan
             // 
+            this.tabPlan.Controls.Add(this.dateTimePicker1);
             this.tabPlan.Controls.Add(this.btnDelPlan);
             this.tabPlan.Controls.Add(this.dataPlan);
-            this.tabPlan.Controls.Add(this.label5);
-            this.tabPlan.Controls.Add(this.comboMinute1);
-            this.tabPlan.Controls.Add(this.comboMinute2);
-            this.tabPlan.Controls.Add(this.comboHour);
             this.tabPlan.Controls.Add(this.label4);
             this.tabPlan.Controls.Add(this.btnAddPlan);
             this.tabPlan.Location = new System.Drawing.Point(23, 4);
@@ -398,89 +392,6 @@ namespace Client
             this.time.Name = "time";
             this.time.ReadOnly = true;
             // 
-            // label5
-            // 
-            this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(155, 7);
-            this.label5.Name = "label5";
-            this.label5.Size = new System.Drawing.Size(10, 13);
-            this.label5.TabIndex = 5;
-            this.label5.Text = ":";
-            // 
-            // comboMinute1
-            // 
-            this.comboMinute1.FormattingEnabled = true;
-            this.comboMinute1.Items.AddRange(new object[] {
-            "0",
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6"});
-            this.comboMinute1.Location = new System.Drawing.Point(171, 4);
-            this.comboMinute1.Name = "comboMinute1";
-            this.comboMinute1.Size = new System.Drawing.Size(33, 21);
-            this.comboMinute1.TabIndex = 4;
-            this.comboMinute1.Text = "1";
-            this.comboMinute1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.comboHour_KeyPress);
-            // 
-            // comboMinute2
-            // 
-            this.comboMinute2.FormattingEnabled = true;
-            this.comboMinute2.Items.AddRange(new object[] {
-            "0",
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9"});
-            this.comboMinute2.Location = new System.Drawing.Point(210, 4);
-            this.comboMinute2.Name = "comboMinute2";
-            this.comboMinute2.Size = new System.Drawing.Size(33, 21);
-            this.comboMinute2.TabIndex = 3;
-            this.comboMinute2.Text = "5";
-            this.comboMinute2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.comboHour_KeyPress);
-            // 
-            // comboHour
-            // 
-            this.comboHour.FormattingEnabled = true;
-            this.comboHour.Items.AddRange(new object[] {
-            "0",
-            "1",
-            "2",
-            "3",
-            "4",
-            "5",
-            "6",
-            "7",
-            "8",
-            "9",
-            "10",
-            "11",
-            "12",
-            "13",
-            "14",
-            "15",
-            "16",
-            "17",
-            "18",
-            "19",
-            "20",
-            "21",
-            "22",
-            "23"});
-            this.comboHour.Location = new System.Drawing.Point(109, 4);
-            this.comboHour.Name = "comboHour";
-            this.comboHour.Size = new System.Drawing.Size(40, 21);
-            this.comboHour.TabIndex = 2;
-            this.comboHour.Text = "6";
-            this.comboHour.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.comboHour_KeyPress);
-            // 
             // label4
             // 
             this.label4.AutoSize = true;
@@ -492,9 +403,9 @@ namespace Client
             // 
             // btnAddPlan
             // 
-            this.btnAddPlan.Location = new System.Drawing.Point(249, 2);
+            this.btnAddPlan.Location = new System.Drawing.Point(243, 3);
             this.btnAddPlan.Name = "btnAddPlan";
-            this.btnAddPlan.Size = new System.Drawing.Size(114, 23);
+            this.btnAddPlan.Size = new System.Drawing.Size(120, 23);
             this.btnAddPlan.TabIndex = 0;
             this.btnAddPlan.Text = "Add to plan list";
             this.btnAddPlan.UseVisualStyleBackColor = true;
@@ -529,6 +440,29 @@ namespace Client
             this.dataQarantine.ReadOnly = true;
             this.dataQarantine.Size = new System.Drawing.Size(484, 162);
             this.dataQarantine.TabIndex = 2;
+            // 
+            // QFile
+            // 
+            this.QFile.Frozen = true;
+            this.QFile.HeaderText = "Infected file";
+            this.QFile.Name = "QFile";
+            this.QFile.ReadOnly = true;
+            this.QFile.Width = 200;
+            // 
+            // Found
+            // 
+            this.Found.Frozen = true;
+            this.Found.HeaderText = "Was found in";
+            this.Found.Name = "Found";
+            this.Found.ReadOnly = true;
+            // 
+            // QVirus
+            // 
+            this.QVirus.Frozen = true;
+            this.QVirus.HeaderText = "Found virus ";
+            this.QVirus.Name = "QVirus";
+            this.QVirus.ReadOnly = true;
+            this.QVirus.Width = 200;
             // 
             // btnRestore
             // 
@@ -589,28 +523,16 @@ namespace Client
             this.tableLayoutPanel1.Size = new System.Drawing.Size(524, 353);
             this.tableLayoutPanel1.TabIndex = 13;
             // 
-            // QFile
+            // dateTimePicker1
             // 
-            this.QFile.Frozen = true;
-            this.QFile.HeaderText = "Infected file";
-            this.QFile.Name = "QFile";
-            this.QFile.ReadOnly = true;
-            this.QFile.Width = 200;
-            // 
-            // Found
-            // 
-            this.Found.Frozen = true;
-            this.Found.HeaderText = "Was found in";
-            this.Found.Name = "Found";
-            this.Found.ReadOnly = true;
-            // 
-            // QVirus
-            // 
-            this.QVirus.Frozen = true;
-            this.QVirus.HeaderText = "Found virus ";
-            this.QVirus.Name = "QVirus";
-            this.QVirus.ReadOnly = true;
-            this.QVirus.Width = 200;
+            this.dateTimePicker1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Time;
+            this.dateTimePicker1.Location = new System.Drawing.Point(109, 5);
+            this.dateTimePicker1.Name = "dateTimePicker1";
+            this.dateTimePicker1.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.dateTimePicker1.Size = new System.Drawing.Size(120, 20);
+            this.dateTimePicker1.TabIndex = 8;
             // 
             // Form1
             // 
@@ -676,10 +598,6 @@ namespace Client
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.Button btnAddPlan;
         private System.Windows.Forms.DataGridView dataPlan;
-        private System.Windows.Forms.Label label5;
-        private System.Windows.Forms.ComboBox comboMinute1;
-        private System.Windows.Forms.ComboBox comboMinute2;
-        private System.Windows.Forms.ComboBox comboHour;
         private System.Windows.Forms.DataGridViewTextBoxColumn path;
         private System.Windows.Forms.DataGridViewTextBoxColumn time;
         private System.Windows.Forms.Button btnDelScan;
@@ -696,6 +614,7 @@ namespace Client
         private System.Windows.Forms.DataGridViewTextBoxColumn QFile;
         private System.Windows.Forms.DataGridViewTextBoxColumn Found;
         private System.Windows.Forms.DataGridViewTextBoxColumn QVirus;
+        private System.Windows.Forms.DateTimePicker dateTimePicker1;
     }
 }
 
