@@ -3,8 +3,8 @@ My study project is about making simple antivirus software for win10.
 
 Structure:
 
-0. BaseEditor - editing malware base program
-1. Client - connect with service program
-2. Service - antimalware program
-3. ServiceControl - service start/stop program
-4. ServiceConsole - service debug program
+0. BaseEditor - editing malware base app
+1. Client - client app which connect to service
+2. Service - antimalware service app
+3. ServiceControl - service start/stop app
+4. avdb.avb - malware signature database file

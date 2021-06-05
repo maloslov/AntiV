@@ -138,5 +138,26 @@ namespace Service
                 lock (toScan)
                     toScan.Add(d);
         }
+
+        public static void restore(string path)
+        {
+            var sr = File.Open(path, FileMode.Open, FileAccess.ReadWrite);
+            {
+                sr.Position = 0;
+                var buf = new byte[2];
+                sr.Read(buf, 0, buf.Length);
+                buf[0] -= 25; buf[1] -= 25;
+                sr.Position = 0;
+                sr.Write(buf, 0, buf.Length);
+            }
+        }
+        public static void delete(string path)
+        {
+            try { File.Delete(path); }
+            catch (Exception ex)
+            {
+
+            }
+        }
     }
 }

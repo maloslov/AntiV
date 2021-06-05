@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO.Pipes;
 using System.Threading;
+using System.IO;
 
 namespace Client
 {
@@ -133,6 +134,7 @@ namespace Client
 
         private void pipeStreamer()
         {
+            again:
             using (var pipe = new NamedPipeClientStream(
                 ".", "antiv1",
                 PipeDirection.InOut,
@@ -159,7 +161,11 @@ namespace Client
                             buf = Encoding.UTF8.GetBytes(messageOut.Dequeue());
                         else buf = new byte[] { 0, 0 };
                     }
-                    pipe.Write(buf, 0, buf.Length);
+                    try
+                    {
+                        pipe.Write(buf, 0, buf.Length);
+                    }
+                    catch (Exception ex) { goto again; }
                 }
                 buf = new byte[256];
                 pipe.Read(buf, 0, buf.Length);
@@ -257,7 +263,9 @@ namespace Client
         {
             if (textPath.Text.Length > 0)
             {
-                var str = textPath.Text.Substring(0,textPath.Text.LastIndexOf('\\'));
+                var str = textPath.Text;
+                if (File.Exists(str))
+                    str = textPath.Text.Substring(0, textPath.Text.LastIndexOf('\\'));
                 foreach(DataGridViewRow r in dataMonitor.Rows)
                 {
                     if (r.Cells[0].Value.Equals(str))
@@ -320,5 +328,33 @@ namespace Client
             }
         }
         #endregion
+
+        private void btnDelete_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow r in dataQarantine.Rows)
+            {
+                if (r.Selected)
+                {
+                    dataQarantine.Rows.Remove(r);
+                    lock (messageOut)
+                        messageOut.Enqueue("\u0000\u0010"
+                            + r.Cells[0].Value);
+                }
+            }
+        }
+
+        private void btnRestore_Click(object sender, EventArgs e)
+        {
+            foreach (DataGridViewRow r in dataQarantine.Rows)
+            {
+                if (r.Selected)
+                {
+                    dataQarantine.Rows.Remove(r);
+                    lock (messageOut)
+                        messageOut.Enqueue("\u0000\u0011"
+                            + r.Cells[0].Value);
+                }
+            }
+        }
     }
 }

@@ -28,7 +28,7 @@ namespace BaseEditor
         #region tab2
         private void readExe_Click(object sender, EventArgs e)
         {
-            openFileDialog1.Filter = "Executable file|*.exe";
+            openFileDialog1.Filter = "Executable file|*.exe|Zip file|*.zip";
             if (openFileDialog1.ShowDialog() == DialogResult.Cancel)
             {
                 return;

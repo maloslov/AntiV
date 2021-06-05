@@ -180,19 +180,16 @@ namespace Service
                             ScanEngine.toScan.Remove(str.Substring(2).Trim('\0'));
                         break;
                     case '\u0006': //monitor add
-                        using (var fsw = new FileSystemWatcher(str.Substring(2).Trim('\0')))
-                        {
-                            fsw.Created += new FileSystemEventHandler(newMonitor);
-                            if (!monitoringDirs.Contains(fsw))
-                                monitoringDirs.Add(fsw);
+                        var fsw = (str.Substring(2).Trim('\0'));
+                        if (!monitoringDirs.Contains(monitoringDirs.Find(x => x.Path == fsw)))
+                        { 
+                            monitoringDirs.Add(new FileSystemWatcher(fsw));
+                            monitoringDirs.Last().Created += new FileSystemEventHandler(newMonitor);
                         }
                         break;
                     case '\u0007': //monitor remove
-                        using (var fsw = new FileSystemWatcher(str.Substring(2).Trim('\0')))
-                        {
-                            fsw.Created += new FileSystemEventHandler(newMonitor);
-                            monitoringDirs.Remove(fsw);
-                        }
+                        var fsw2 = (str.Substring(2).Trim('\0'));
+                        monitoringDirs.Remove(monitoringDirs.Find(x => x.Path == fsw2));
                         break;
                     case '\u0008': //plan add
                         if (!planningScan.Contains(
@@ -207,6 +204,12 @@ namespace Service
                     case '\u000B': //ask status
                         lock (messageOut)
                             messageOut.Enqueue("\u0000\u0004");
+                        break;
+                    case '\u0010': //delete from qarantine
+                        ScanEngine.delete(str.Substring(2).Trim('\0'));
+                        break;
+                    case '\u0011': //restore from qarantin
+                        ScanEngine.restore(str.Substring(2).Trim('\0'));
                         break;
                 }
             }

@@ -56,6 +56,7 @@ namespace Client
             this.dir = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.btnAddMonitor = new System.Windows.Forms.Button();
             this.tabPlan = new System.Windows.Forms.TabPage();
+            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             this.btnDelPlan = new System.Windows.Forms.Button();
             this.dataPlan = new System.Windows.Forms.DataGridView();
             this.path = new System.Windows.Forms.DataGridViewTextBoxColumn();
@@ -72,7 +73,6 @@ namespace Client
             this.textLog = new System.Windows.Forms.RichTextBox();
             this.label3 = new System.Windows.Forms.Label();
             this.tableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
-            this.dateTimePicker1 = new System.Windows.Forms.DateTimePicker();
             this.tabControl1.SuspendLayout();
             this.tabScan.SuspendLayout();
             ((System.ComponentModel.ISupportInitialize)(this.dataScan)).BeginInit();
@@ -350,6 +350,17 @@ namespace Client
             this.tabPlan.Text = "Plan";
             this.tabPlan.UseVisualStyleBackColor = true;
             // 
+            // dateTimePicker1
+            // 
+            this.dateTimePicker1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Time;
+            this.dateTimePicker1.Location = new System.Drawing.Point(109, 5);
+            this.dateTimePicker1.Name = "dateTimePicker1";
+            this.dateTimePicker1.RightToLeft = System.Windows.Forms.RightToLeft.No;
+            this.dateTimePicker1.Size = new System.Drawing.Size(120, 20);
+            this.dateTimePicker1.TabIndex = 8;
+            // 
             // btnDelPlan
             // 
             this.btnDelPlan.Location = new System.Drawing.Point(369, 2);
@@ -472,6 +483,7 @@ namespace Client
             this.btnRestore.TabIndex = 1;
             this.btnRestore.Text = "restore file";
             this.btnRestore.UseVisualStyleBackColor = true;
+            this.btnRestore.Click += new System.EventHandler(this.btnRestore_Click);
             // 
             // btnDelete
             // 
@@ -481,6 +493,7 @@ namespace Client
             this.btnDelete.TabIndex = 0;
             this.btnDelete.Text = "delete file";
             this.btnDelete.UseVisualStyleBackColor = true;
+            this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click);
             // 
             // textLog
             // 
@@ -522,17 +535,6 @@ namespace Client
             this.tableLayoutPanel1.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 35F));
             this.tableLayoutPanel1.Size = new System.Drawing.Size(524, 353);
             this.tableLayoutPanel1.TabIndex = 13;
-            // 
-            // dateTimePicker1
-            // 
-            this.dateTimePicker1.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-            this.dateTimePicker1.Format = System.Windows.Forms.DateTimePickerFormat.Time;
-            this.dateTimePicker1.Location = new System.Drawing.Point(109, 5);
-            this.dateTimePicker1.Name = "dateTimePicker1";
-            this.dateTimePicker1.RightToLeft = System.Windows.Forms.RightToLeft.No;
-            this.dateTimePicker1.Size = new System.Drawing.Size(120, 20);
-            this.dateTimePicker1.TabIndex = 8;
             // 
             // Form1
             // 
